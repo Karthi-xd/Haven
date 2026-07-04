@@ -34,16 +34,42 @@ api.interceptors.response.use(
   }
 );
 
-export async function login(identifier: string, password: string) {
-  const { data } = await api.post("/auth/login/", { username: identifier, password });
+export async function login(email: string, password: string) {
+  const { data } = await api.post("/auth/login/", { email, password });
   localStorage.setItem("access_token", data.access);
   localStorage.setItem("refresh_token", data.refresh);
   return data;
 }
 
-export async function register(username: string, email: string, password: string, display_name = "") {
-  const { data } = await api.post("/auth/register/", { username, email, password, display_name });
+export async function register(email: string, password: string, display_name = "") {
+  const { data } = await api.post("/auth/register/", { email, password, display_name });
   return data;
+}
+
+/**
+ * Turns an axios error into a single human-readable string.
+ * - No `error.response` at all  -> the request never reached the server (backend down,
+ *   wrong VITE_API_URL, CORS block, offline). We say so explicitly instead of guessing.
+ * - `error.response.data` is DRF's validation shape ({ field: [...] } or { detail: "..." }
+ *   or { non_field_errors: [...] }). We flatten whichever shape shows up.
+ */
+export function getErrorMessage(error: any, fallback: string): string {
+  if (!error?.response) {
+    return "Can't reach the server. Make sure the backend is running and try again.";
+  }
+
+  const data = error.response.data;
+  if (!data) return fallback;
+  if (typeof data === "string") return data;
+  if (data.detail) return Array.isArray(data.detail) ? data.detail.join(" ") : data.detail;
+
+  const parts: string[] = [];
+  for (const [field, value] of Object.entries(data)) {
+    const text = Array.isArray(value) ? value.join(" ") : String(value);
+    if (field === "non_field_errors") parts.push(text);
+    else parts.push(`${field}: ${text}`);
+  }
+  return parts.length ? parts.join(" ") : fallback;
 }
 
 export async function fetchMe() {

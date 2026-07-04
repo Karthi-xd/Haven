@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { register, login } from "../api/client";
+import { register, login, getErrorMessage } from "../api/client";
 
 interface RegisterProps {
   active: boolean;
@@ -10,26 +10,22 @@ interface RegisterProps {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
 export default function Register({ active, play, onBack, onSuccess, onLogin }: RegisterProps) {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [emailError, setEmailError] = useState("");
-  const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const emailFilled = email.trim().length > 0;
-  const usernameFilled = username.trim().length > 0;
   const passwordFilled = password.trim().length > 0;
-  
-  const inBloom = emailFilled && usernameFilled && passwordFilled && !emailError && !usernameError && !passwordError;
+
+  const inBloom = emailFilled && passwordFilled && !emailError && !passwordError;
 
   function validateEmail() {
     const val = email.trim();
@@ -38,16 +34,6 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
       setEmailError("Please enter a valid email address.");
     } else {
       setEmailError("");
-    }
-  }
-
-  function validateUsername() {
-    const val = username.trim();
-    if (val.length === 0) { setUsernameError(""); return; }
-    if (!USERNAME_RE.test(val)) {
-      setUsernameError("Username must be 3-20 characters (letters, numbers, underscores).");
-    } else {
-      setUsernameError("");
     }
   }
 
@@ -64,39 +50,25 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     validateEmail();
-    validateUsername();
     validatePassword();
 
-    if (!email.trim() || !username.trim() || password.length < 8 || emailError || usernameError || passwordError) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !EMAIL_RE.test(trimmedEmail) || password.length < 8) {
+      if (!trimmedEmail) setEmailError("Email address is required.");
+      if (password.length < 8) setPasswordError("Password must be at least 8 characters long.");
       return;
     }
 
     setError("");
     setSubmitting(true);
     try {
-      // 1. Sign up the user
-      await register(username.trim(), email.trim(), password);
-      // 2. Perform silent login to store access/refresh tokens
-      await login(email.trim(), password);
+      // 1. Create the account (email + password only — username is chosen later, in-app)
+      await register(trimmedEmail, password);
+      // 2. Log straight in with the same credentials to grab access/refresh tokens
+      await login(trimmedEmail, password);
       onSuccess();
     } catch (err: any) {
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        // Build readable errors from the API response
-        let finalMsg = "";
-        if (errorData.username) {
-          finalMsg += `Username: ${errorData.username.join(" ")} `;
-        }
-        if (errorData.email) {
-          finalMsg += `Email: ${errorData.email.join(" ")} `;
-        }
-        if (errorData.password) {
-          finalMsg += `Password: ${errorData.password.join(" ")} `;
-        }
-        setError(finalMsg || "Could not register. Please try another username or email.");
-      } else {
-        setError("Could not connect to the server. Please check your connection.");
-      }
+      setError(getErrorMessage(err, "Couldn't create your account. Please try again."));
     } finally {
       setSubmitting(false);
     }
@@ -174,27 +146,8 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
                 {emailError && <p className="field-error-msg">{emailError}</p>}
               </div>
 
-              {/* Username Field */}
-              <div className={`vine-field fx fx-4${usernameFilled ? " filled" : ""}${usernameError ? " field-error" : ""}`}>
-                <span className="vine-bud" aria-hidden="true" />
-                <label htmlFor="reg-username">Username</label>
-                <div className="input-wrap">
-                  <input
-                    id="reg-username"
-                    type="text"
-                    placeholder="explorer_name"
-                    autoComplete="off"
-                    value={username}
-                    onChange={(e) => { setUsername(e.target.value); if (usernameError) setUsernameError(""); }}
-                    onBlur={validateUsername}
-                  />
-                  <div className="input-underline" />
-                </div>
-                {usernameError && <p className="field-error-msg">{usernameError}</p>}
-              </div>
-
               {/* Password Field */}
-              <div className={`vine-field fx fx-5${passwordFilled ? " filled" : ""}${passwordError ? " field-error" : ""}`}>
+              <div className={`vine-field fx fx-4${passwordFilled ? " filled" : ""}${passwordError ? " field-error" : ""}`}>
                 <span className="vine-bud" aria-hidden="true" />
                 <label htmlFor="reg-password">Password</label>
                 <div className="input-wrap">
@@ -228,9 +181,9 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
 
             </div>
 
-            {error && <p className="form-error fx fx-6">{error}</p>}
+            {error && <p className="form-error fx fx-5">{error}</p>}
 
-            <button type="submit" className="login-submit fx fx-6" disabled={submitting}>
+            <button type="submit" className="login-submit fx fx-5" disabled={submitting}>
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2c-1.8 0-2 1.6-2.6 2.3C6.5 6.7 4 9.6 4 13c0 3.6 2.8 6.6 6.4 7.8.5.2 1.1.2 1.6 0C15.6 19.6 18.4 16.6 18.4 13c0-3.4-2.5-6.3-5.4-8.7C12.4 3.6 12.2 2 12 2z" />
               </svg>
@@ -238,7 +191,7 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
             </button>
           </form>
 
-          <p className="footer-text fx fx-7">
+          <p className="footer-text fx fx-6">
             Already have an account? <button type="button" className="back-link" style={{ margin: 0, paddingLeft: 4, display: 'inline', fontWeight: 700 }} onClick={onLogin}>Log in</button>
           </p>
         </div>

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { login } from "../api/client";
+import { login, getErrorMessage } from "../api/client";
 
 interface LoginProps {
   active: boolean;
@@ -54,8 +54,8 @@ export default function Login({ active, play, onBack, onSuccess, onSignUp }: Log
     try {
       await login(identifier, password);
       onSuccess();
-    } catch {
-      setError("Couldn't log you in — check your details and try again.");
+    } catch (err: any) {
+      setError(getErrorMessage(err, "Couldn't log you in — check your details and try again."));
     } finally {
       setSubmitting(false);
     }

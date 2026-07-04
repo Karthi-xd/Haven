@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { updateProfile } from "../api/client";
+import { updateProfile, getErrorMessage } from "../api/client";
 
 interface CompleteProfileProps {
   active: boolean;
@@ -86,15 +86,7 @@ export default function CompleteProfile({ active, play, initialUsername, onSucce
       });
       onSuccess();
     } catch (err: any) {
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        let finalMsg = "";
-        if (errorData.username) finalMsg += `Username: ${errorData.username.join(" ")} `;
-        if (errorData.display_name) finalMsg += `Display Name: ${errorData.display_name.join(" ")} `;
-        setError(finalMsg || "Failed to update profile. Please try a different username.");
-      } else {
-        setError("Could not save profile details. Please try again.");
-      }
+      setError(getErrorMessage(err, "Failed to update profile. Please try a different username."));
     } finally {
       setSubmitting(false);
     }
