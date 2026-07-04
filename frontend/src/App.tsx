@@ -120,15 +120,30 @@ export default function App() {
     requestAnimationFrame(() => setProfilePlay(true));
   }
 
-  function handleLoginSuccess() {
-    // After login, check if profile is complete
+  async function handleLoginSuccess() {
+    // After login, only send the user to "complete profile" if they
+    // genuinely haven't finished it yet — otherwise straight to the dashboard.
     setLoginActive(false);
     setLoginPlay(false);
-    setInitialUsername("");
-    setProfileActive(true);
-    setProfilePlay(false);
-    setView("complete-profile");
-    requestAnimationFrame(() => setProfilePlay(true));
+    try {
+      const data = await fetchMe();
+      if (data.display_name && data.username) {
+        setView("dashboard");
+      } else {
+        setInitialUsername(data.username || "");
+        setProfileActive(true);
+        setProfilePlay(false);
+        setView("complete-profile");
+        requestAnimationFrame(() => setProfilePlay(true));
+      }
+    } catch {
+      // If this fails for some reason, fall back to complete-profile rather than a dead end.
+      setInitialUsername("");
+      setProfileActive(true);
+      setProfilePlay(false);
+      setView("complete-profile");
+      requestAnimationFrame(() => setProfilePlay(true));
+    }
   }
 
   function handleProfileComplete() {
@@ -146,6 +161,8 @@ export default function App() {
     setProfileActive(false);
     setProfilePlay(false);
   }
+
+  const showPetals = view === "landing" || view === "login" || view === "register";
 
   if (checkingAuth) {
     return (
@@ -167,7 +184,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <PetalCanvas />
+      {showPetals && <PetalCanvas />}
       <div className="glow" />
 
       <div className="petal-transition" ref={transitionOverlayRef} aria-hidden="true">
