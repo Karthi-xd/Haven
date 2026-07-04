@@ -1,5 +1,6 @@
 import { fetchMe } from "../api/client";
 import { useEffect, useState } from "react";
+import LoadingScene from "./LoadingScene";
 
 interface DashboardPlaceholderProps {
   onLogout: () => void;
@@ -35,11 +36,7 @@ export default function DashboardPlaceholder({ onLogout }: DashboardPlaceholderP
   }
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: 'var(--white-soft)' }}>
-        <p style={{ color: 'var(--cherry)', fontSize: '18px', fontWeight: 600 }}>Loading Haven...</p>
-      </div>
-    );
+    return <LoadingScene />;
   }
 
   const displayName = profile?.display_name || "Explorer";

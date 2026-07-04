@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { register, login, getErrorMessage } from "../api/client";
+import BrandScene from "./BrandScene";
 
 interface RegisterProps {
   active: boolean;
@@ -80,21 +81,7 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
         
         {/* LEFT — brand panel */}
         <div className="login-brand-panel fx fx-1">
-          <div className="login-brand-wordmark">Haven</div>
-          <p className="login-brand-tagline">Create your profile and own your space.</p>
-          <div className="login-brand-features">
-            {[
-              { icon: "✨", text: "Create an identity uniquely yours" },
-              { icon: "🛡️", text: "No central tracking, zero algorithm feeds" },
-              { icon: "🌸", text: "Choose your own pace and custom theme" },
-              { icon: "🤝", text: "Join discussions and find community" },
-            ].map((f) => (
-              <div className="login-brand-feature" key={f.text}>
-                <div className="login-brand-feature-icon">{f.icon}</div>
-                <span>{f.text}</span>
-              </div>
-            ))}
-          </div>
+          <BrandScene tagline="Create your profile and own your space." />
         </div>
 
         {/* RIGHT — form */}

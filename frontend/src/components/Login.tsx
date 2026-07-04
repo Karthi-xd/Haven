@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { login, getErrorMessage } from "../api/client";
+import BrandScene from "./BrandScene";
 
 interface LoginProps {
   active: boolean;
@@ -67,21 +68,7 @@ export default function Login({ active, play, onBack, onSuccess, onSignUp }: Log
 
         {/* LEFT — brand panel */}
         <div className="login-brand-panel fx fx-1">
-          <div className="login-brand-wordmark">Haven</div>
-          <p className="login-brand-tagline">Communities built on real conversations, not algorithms.</p>
-          <div className="login-brand-features">
-            {[
-              { icon: "🌸", text: "Discover communities for anything you care about" },
-              { icon: "🗳️", text: "Vote on posts and comments that matter" },
-              { icon: "💬", text: "Threaded discussions with real depth" },
-              { icon: "🛡️", text: "Community-led moderation, no algorithm bias" },
-            ].map((f) => (
-              <div className="login-brand-feature" key={f.text}>
-                <div className="login-brand-feature-icon">{f.icon}</div>
-                <span>{f.text}</span>
-              </div>
-            ))}
-          </div>
+          <BrandScene tagline="Communities built on real conversations, not algorithms." />
         </div>
 
         {/* RIGHT — form */}

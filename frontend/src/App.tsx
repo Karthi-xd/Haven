@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import CompleteProfile from "./components/CompleteProfile";
 import DashboardPlaceholder from "./components/DashboardPlaceholder";
+import LoadingScene from "./components/LoadingScene";
 import { usePetalTransition } from "./hooks/usePetalTransition";
 import { fetchMe } from "./api/client";
 
@@ -169,15 +170,7 @@ export default function App() {
       <div className="app">
         <PetalCanvas />
         <div className="glow" />
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 10,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #FFF6F7 55%, #FFEFF1 100%)'
-        }}>
-          <p style={{ color: 'var(--cherry)', fontSize: '18px', fontWeight: 600, fontFamily: 'Zen Kaku Gothic New, sans-serif' }}>
-            Loading Haven...
-          </p>
-        </div>
+        <LoadingScene />
       </div>
     );
   }

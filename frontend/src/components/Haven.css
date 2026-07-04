@@ -1031,3 +1031,189 @@ input:focus-visible {
   background: linear-gradient(90deg, transparent, var(--line), transparent);
   margin: 22px 0;
 }
+
+/* ================= LOADING SCREEN ================= */
+.loading-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF6F7 55%, #FFEFF1 100%);
+}
+
+.loading-blossom-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-blossom {
+  width: 56px;
+  height: 56px;
+  animation: loading-spin 2.6s linear infinite;
+}
+.loading-blossom .lb-petal {
+  fill: var(--cherry-bright);
+  transform-origin: 50px 50px;
+}
+.loading-blossom .lb-petal:nth-child(2) { fill: var(--cherry); }
+.loading-blossom .lb-petal:nth-child(3) { fill: var(--blush); stroke: var(--line); stroke-width: 1; }
+.loading-blossom .lb-petal:nth-child(4) { fill: var(--cherry); }
+.loading-blossom .lb-petal:nth-child(5) { fill: var(--cherry-bright); }
+.loading-blossom-center {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cherry-deep);
+  animation: loading-pulse 1.6s var(--ease) infinite;
+}
+@keyframes loading-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes loading-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.7; }
+}
+
+.loading-text {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+}
+.loading-text .dot {
+  animation: loading-dot 1.4s ease-in-out infinite;
+  opacity: 0.3;
+}
+.loading-text .dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-text .dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes loading-dot {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+
+/* ================= INTERACTIVE BRAND SCENE (Login / Register left panel) ================= */
+.brand-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.brand-scene-wordmark {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--cherry-deep);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+  will-change: transform;
+  transition: transform 0.15s var(--ease-out);
+}
+.brand-scene-wordmark span { color: var(--cherry-bright); }
+
+.brand-scene-tagline {
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  letter-spacing: 0.06em;
+  text-align: center;
+  margin-bottom: 8px;
+  max-width: 24ch;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-scene-hint {
+  font-size: 11px;
+  color: var(--ink-muted);
+  opacity: 0.65;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-scene-orbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.brand-orb-hit {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  cursor: grab;
+  z-index: 1;
+}
+.brand-orb-hit.dragging { cursor: grabbing; z-index: 5; }
+
+.brand-orb-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 8px 20px rgba(196,24,60,0.22), inset 0 0 0 2px rgba(255,255,255,0.5);
+  animation: orb-float 4.5s ease-in-out infinite;
+  transition: transform 0.2s var(--ease-out);
+}
+.brand-orb-hit:hover .brand-orb-inner,
+.brand-orb-hit.dragging .brand-orb-inner {
+  transform: scale(1.12);
+}
+.brand-orb-hit.dragging .brand-orb-inner { animation-play-state: paused; }
+
+@keyframes orb-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(4deg); }
+}
+
+.brand-orb-label {
+  position: absolute;
+  top: calc(100% + 10px);
+  width: 150px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cherry-deep);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 8px;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 6px 16px rgba(196,24,60,0.14);
+}
+.brand-orb-hit:hover .brand-orb-label,
+.brand-orb-hit.dragging .brand-orb-label {
+  opacity: 1;
+  transform: translateY(0);
+}
