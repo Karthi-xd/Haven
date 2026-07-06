@@ -68,7 +68,7 @@ export default function Login({ active, play, onBack, onSuccess, onSignUp }: Log
 
         {/* LEFT — brand panel */}
         <div className="login-brand-panel fx fx-1">
-          <BrandScene tagline="Communities built on real conversations, not algorithms." />
+          <BrandScene />
         </div>
 
         {/* RIGHT — form */}

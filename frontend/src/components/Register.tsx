@@ -81,7 +81,7 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
         
         {/* LEFT — brand panel */}
         <div className="login-brand-panel fx fx-1">
-          <BrandScene tagline="Create your profile and own your space." />
+          <BrandScene />
         </div>
 
         {/* RIGHT — form */}
