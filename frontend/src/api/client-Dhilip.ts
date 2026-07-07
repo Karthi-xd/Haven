@@ -77,31 +77,7 @@ export async function fetchMe() {
   return data;
 }
 
-interface ProfileUpdate {
-  username?: string;
-  display_name?: string;
-  avatar_url?: string;
-  bio?: string;
-  interests?: string;
-  avatar_file?: File | null;
-}
-
-export async function updateProfile(profileData: ProfileUpdate) {
-  const { avatar_file, ...rest } = profileData;
-
-  if (avatar_file) {
-    // A real file was picked from the device — send as multipart/form-data.
-    const form = new FormData();
-    Object.entries(rest).forEach(([key, value]) => {
-      if (value !== undefined) form.append(key, value);
-    });
-    form.append("avatar_image", avatar_file);
-    const { data } = await api.patch("/auth/me/", form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return data;
-  }
-
-  const { data } = await api.patch("/auth/me/", rest);
+export async function updateProfile(profileData: { username?: string; display_name?: string; avatar_url?: string; bio?: string }) {
+  const { data } = await api.patch("/auth/me/", profileData);
   return data;
 }

@@ -1190,63 +1190,70 @@ input:focus-visible {
   50% { background-position: 100% 50%; }
 }
 
-/* ================= PIGEON SHADOW ================= */
-.pigeon-shadow {
+/* ================= PIGEON (real dove image, hovering above wordmark) ================= */
+/* Wrapper that holds the dove + its ground shadow, positioned once above
+   the wordmark — no flight path, just a settled, living perch. */
+.pigeon-perch {
   position: absolute;
   left: 50%;
-  top: -55px;
+  top: -68px;
   z-index: 2;
-  width: 85px;
-  height: auto;
+  width: 96px;
+  transform: translateX(-50%);
   pointer-events: none;
-  animation:
-    pigeon-fly-in 2.5s var(--ease-out) forwards,
-    pigeon-idle 3s ease-in-out 2.5s infinite;
 }
 
-.pigeon-shadow svg {
+/* Single image, two layered transforms:
+     - outer .pigeon-shadow carries a gentle hover bob
+     - inner .pigeon-img carries a soft squash/stretch "flutter"
+   Both are smooth, continuous transforms on the SAME whole photo, so
+   there are no clip seams or hinge pops — it reads as one fluid motion. */
+.pigeon-shadow {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 466 / 416; /* matches dove.png's actual pixel ratio */
+  height: auto;
+  will-change: transform;
+  /* Because dove.png has real transparency, drop-shadow traces the
+     bird's actual silhouette (wings, tail, branch) rather than a box.
+     One tight 0-offset layer for an all-around shadow "outline", plus
+     one soft wider layer for depth/lift underneath it. */
+  filter:
+    drop-shadow(0 0 3px rgba(122, 15, 38, 0.35))
+    drop-shadow(0 8px 14px rgba(122, 15, 38, 0.2));
+  animation: pigeon-idle 4.6s ease-in-out infinite;
+}
+
+.pigeon-img {
   display: block;
   width: 100%;
-  height: auto;
-  opacity: 0.7;
-  filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
+  height: 100%;
+  transform-origin: 50% 58%;
+  will-change: transform;
+  /* soft squash/stretch "wingbeat" — smooth sine-like easing across 5
+     evenly-spaced keyframes, so the browser interpolates one continuous
+     curve instead of snapping between a few hard poses */
+  animation: dove-flutter-rest 4.6s ease-in-out infinite;
 }
 
-@keyframes pigeon-fly-in {
-  0% {
-    transform: translateX(-50%) translate(300px, -250px) rotate(30deg) scale(0.2);
-    opacity: 0;
-  }
-  25% {
-    opacity: 0.4;
-  }
-  60% {
-    transform: translateX(-50%) translate(50px, -60px) rotate(8deg) scale(0.7);
-    opacity: 0.75;
-  }
-  85% {
-    transform: translateX(-50%) translate(5px, -10px) rotate(-2deg) scale(0.95);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translateX(-50%) translate(0, 0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
+@keyframes dove-flutter-rest {
+  0%, 100% { transform: scaleY(1)     scaleX(1)     rotate(0deg); }
+  50%      { transform: scaleY(0.985) scaleX(1.008) rotate(-0.5deg); }
 }
 
 @keyframes pigeon-idle {
-  0%, 100% {
-    transform: translateX(-50%) translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translateX(-50%) translate(0, -2.5px) rotate(1deg);
-  }
+  0%, 100% { transform: translate(0, 0)      rotate(0deg); }
+  25%      { transform: translate(0, -1.4px) rotate(0.5deg); }
+  50%      { transform: translate(0, -2.5px) rotate(1deg); }
+  75%      { transform: translate(0, -1.4px) rotate(0.5deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .pigeon-shadow {
     animation: none;
-    transform: translateX(-50%) translate(0, 0);
-    opacity: 1;
+  }
+  .pigeon-img {
+    animation: none !important;
+    transform: none !important;
   }
 }

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
 import { updateProfile, getErrorMessage } from "../api/client";
 
 interface CompleteProfileProps {
@@ -19,23 +19,77 @@ const PRESET_AVATARS = [
   { name: "Grove", seed: "grove", url: "https://api.dicebear.com/7.x/bottts/svg?seed=grove" },
 ];
 
+const TOPICS = [
+  "Gaming", "Technology", "Art & Design", "Sports", "Music", "Movies & TV",
+  "Science", "Books", "Food", "Fitness", "Travel", "Photography",
+];
+
+const BIO_LIMIT = 280;
+
 export default function CompleteProfile({ active, play, initialUsername, onSuccess }: CompleteProfileProps) {
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState(initialUsername || "");
-  const [selectedAvatar, setSelectedAvatar] = useState(PRESET_AVATARS[0].url);
-  const [customAvatarUrl, setCustomAvatarUrl] = useState("");
-  const [useCustomUrl, setUseCustomUrl] = useState(false);
+  const [bio, setBio] = useState("");
+  const [interests, setInterests] = useState<string[]>([]);
+
+  // Avatar: either an uploaded file (from the user's own device) or a preset URL.
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>(PRESET_AVATARS[0].url);
+  const [selectedPreset, setSelectedPreset] = useState(PRESET_AVATARS[0].url);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [usernameError, setUsernameError] = useState("");
   const [displayNameError, setDisplayNameError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const finalAvatar = useCustomUrl ? customAvatarUrl : selectedAvatar;
-
   const displayNameFilled = displayName.trim().length > 0;
   const usernameFilled = username.trim().length > 0;
   const inBloom = displayNameFilled && usernameFilled && !usernameError && !displayNameError;
+
+  function pickFile(file: File | undefined | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image is too large — please pick something under 5MB.");
+      return;
+    }
+    setError("");
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
+    pickFile(e.target.files?.[0]);
+  }
+
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragOver(false);
+    pickFile(e.dataTransfer.files?.[0]);
+  }
+
+  function choosePreset(url: string) {
+    setAvatarFile(null);
+    setSelectedPreset(url);
+    setAvatarPreview(url);
+  }
+
+  function removeUpload() {
+    setAvatarFile(null);
+    setAvatarPreview(selectedPreset);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function toggleInterest(topic: string) {
+    setInterests((prev) =>
+      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
+    );
+  }
 
   function validateUsername() {
     const val = username.trim();
@@ -65,25 +119,27 @@ export default function CompleteProfile({ active, play, initialUsername, onSucce
       return;
     }
 
-    await saveProfile(username.trim(), displayName.trim(), finalAvatar);
+    await saveProfile(username.trim(), displayName.trim());
   }
 
-  async function handleSkipAvatar() {
+  async function handleSkip() {
     const randomNum = Math.floor(10000 + Math.random() * 90000);
     const finalUser = username.trim() || `explorer_${randomNum}`;
     const finalDisplay = displayName.trim() || "New Explorer";
-    await saveProfile(finalUser, finalDisplay, "");
+    await saveProfile(finalUser, finalDisplay, true);
   }
 
-  async function saveProfile(userVal: string, displayVal: string, avatarVal: string) {
+  async function saveProfile(userVal: string, displayVal: string, skipAvatar = false) {
     setError("");
     setSubmitting(true);
     try {
       await updateProfile({
         username: userVal,
         display_name: displayVal,
-        avatar_url: avatarVal,
-        bio: "Just joined Haven!",
+        avatar_url: skipAvatar || avatarFile ? "" : selectedPreset,
+        avatar_file: skipAvatar ? null : avatarFile,
+        bio: bio.trim() || "Just joined Haven!",
+        interests: interests.join(", "),
       });
       onSuccess();
     } catch (err: any) {
@@ -97,37 +153,39 @@ export default function CompleteProfile({ active, play, initialUsername, onSucce
     <section className={`view view-login${active ? " active" : ""}${play ? " play" : ""}`}>
       <div className="login-scene">
 
-        {/* LEFT — brand / art panel */}
+        {/* LEFT — live preview card */}
         <div className="profile-brand-panel fx fx-1">
-          <svg className="profile-blossom-art" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle className="pb-ring" cx="100" cy="100" r="88" />
-            <circle className="pb-ring" cx="100" cy="100" r="70" />
-            <g transform="translate(100 100)">
-              {[0, 60, 120, 180, 240, 300].map((deg, i) => (
-                <ellipse
-                  key={deg}
-                  className={`pb-petal${i % 3 === 1 ? " light" : i % 3 === 2 ? " deep" : ""}`}
-                  cx="0"
-                  cy="-34"
-                  rx="16"
-                  ry="24"
-                  transform={`rotate(${deg})`}
-                />
-              ))}
-              <circle className="pb-center" r="10" />
-            </g>
-          </svg>
-          <h2>Welcome to the grove.</h2>
-          <p>Pick a face and a name for your Haven presence — you can always change it later from settings.</p>
+          <span className="step-badge" style={{ marginBottom: 22 }}>
+            <span className="step-badge-dot">2</span>
+            Almost there
+          </span>
+
+          <div className="preview-card">
+            <div className="preview-card-cover" />
+            <div className="preview-card-avatar">
+              <img src={avatarPreview} alt="Avatar preview" onError={(e) => { (e.target as HTMLImageElement).src = PRESET_AVATARS[0].url; }} />
+            </div>
+            <div className="preview-card-body">
+              <h3>{displayName.trim() || "New Explorer"}</h3>
+              <p className="preview-card-handle">@{username.trim() || "explorer_name"}</p>
+              <p className="preview-card-bio">{bio.trim() || "Just joined Haven!"}</p>
+              {interests.length > 0 && (
+                <div className="preview-card-tags">
+                  {interests.slice(0, 4).map((t) => (
+                    <span key={t} className="preview-tag">{t}</span>
+                  ))}
+                  {interests.length > 4 && <span className="preview-tag">+{interests.length - 4}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <p style={{ marginTop: 22 }}>This is a live preview of your Haven profile card — it updates as you type.</p>
         </div>
 
         {/* RIGHT — form panel */}
         <div className="login-content">
-          <div className="login-head fx fx-2" style={{ marginBottom: "20px" }}>
-            <span className="step-badge">
-              <span className="step-badge-dot">2</span>
-              Almost there
-            </span>
+          <div className="login-head fx fx-2" style={{ marginBottom: 16 }}>
             <h1>Complete<br />your profile.</h1>
             <p className="sub">Set up your identity before joining the community.</p>
           </div>
@@ -135,60 +193,61 @@ export default function CompleteProfile({ active, play, initialUsername, onSucce
           <form onSubmit={handleSave}>
             <div className={`vine-field-list${inBloom ? " in-bloom" : ""}`}>
 
-              {/* Avatar picker */}
+              {/* Avatar upload */}
               <div className="vine-field fx fx-3">
                 <span className="vine-bud" aria-hidden="true" />
                 <label>Profile picture <span style={{ fontWeight: 400, color: "var(--ink-muted)" }}>(optional)</span></label>
 
-                <div className="avatar-picker-row" style={{ marginTop: "10px", marginBottom: "12px" }}>
+                <div
+                  className={`avatar-dropzone${dragOver ? " drag-over" : ""}`}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
                   <div className="avatar-preview-ring">
                     <div className="avatar-preview-ring-inner">
-                      {finalAvatar ? (
-                        <img
-                          src={finalAvatar}
-                          alt="Profile preview"
-                          onError={(e) => { (e.target as HTMLImageElement).src = PRESET_AVATARS[0].url; }}
-                        />
-                      ) : (
-                        <span style={{ fontSize: "30px" }}>🌸</span>
-                      )}
+                      <img src={avatarPreview} alt="Profile preview" onError={(e) => { (e.target as HTMLImageElement).src = PRESET_AVATARS[0].url; }} />
                     </div>
                   </div>
-
-                  <div className="avatar-grid">
-                    {PRESET_AVATARS.map((av) => {
-                      const selected = selectedAvatar === av.url && !useCustomUrl;
-                      return (
-                        <button
-                          key={av.seed}
-                          type="button"
-                          className={`avatar-option${selected ? " selected" : ""}`}
-                          onClick={() => { setSelectedAvatar(av.url); setUseCustomUrl(false); }}
-                          title={av.name}
-                        >
-                          <img src={av.url} alt={av.name} />
-                          {selected && <span className="avatar-option-check">✓</span>}
-                        </button>
-                      );
-                    })}
+                  <div className="avatar-dropzone-text">
+                    <strong>{avatarFile ? avatarFile.name : "Click or drag a photo here"}</strong>
+                    <span>PNG or JPG, up to 5MB — chosen straight from your device</span>
                   </div>
+                  {avatarFile && (
+                    <button type="button" className="avatar-remove-btn" onClick={(e) => { e.stopPropagation(); removeUpload(); }}>
+                      Remove
+                    </button>
+                  )}
                 </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileInput}
+                  style={{ display: "none" }}
+                />
 
-                <button type="button" className="link-btn" onClick={() => setUseCustomUrl(!useCustomUrl)}>
-                  {useCustomUrl ? "Use a preset avatar instead" : "Or paste a custom image URL..."}
-                </button>
-
-                {useCustomUrl && (
-                  <div className="input-wrap fx fx-3" style={{ marginTop: "10px" }}>
-                    <input
-                      type="url"
-                      placeholder="https://example.com/your-image.jpg"
-                      value={customAvatarUrl}
-                      onChange={(e) => setCustomAvatarUrl(e.target.value)}
-                    />
-                    <div className="input-underline" />
-                  </div>
-                )}
+                <p className="link-btn" style={{ marginTop: 12, marginBottom: 8, cursor: "default", textDecoration: "none" }}>
+                  Or pick a starter avatar
+                </p>
+                <div className="avatar-grid">
+                  {PRESET_AVATARS.map((av) => {
+                    const selected = !avatarFile && selectedPreset === av.url;
+                    return (
+                      <button
+                        key={av.seed}
+                        type="button"
+                        className={`avatar-option${selected ? " selected" : ""}`}
+                        onClick={() => choosePreset(av.url)}
+                        title={av.name}
+                      >
+                        <img src={av.url} alt={av.name} />
+                        {selected && <span className="avatar-option-check">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="profile-divider fx fx-3" />
@@ -229,6 +288,45 @@ export default function CompleteProfile({ active, play, initialUsername, onSucce
                 </div>
                 {usernameError && <p className="field-error-msg">{usernameError}</p>}
               </div>
+
+              {/* Bio */}
+              <div className="vine-field fx fx-5">
+                <span className="vine-bud" aria-hidden="true" />
+                <label htmlFor="prof-bio">Bio <span style={{ fontWeight: 400, color: "var(--ink-muted)" }}>(optional)</span></label>
+                <div className="input-wrap">
+                  <textarea
+                    id="prof-bio"
+                    rows={2}
+                    maxLength={BIO_LIMIT}
+                    placeholder="Tell the community a little about yourself..."
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    className="bio-textarea"
+                  />
+                </div>
+                <span className="char-counter">{bio.length}/{BIO_LIMIT}</span>
+              </div>
+
+              {/* Interests */}
+              <div className="vine-field fx fx-5">
+                <span className="vine-bud" aria-hidden="true" />
+                <label>Interests <span style={{ fontWeight: 400, color: "var(--ink-muted)" }}>(optional — helps us suggest communities)</span></label>
+                <div className="topic-chip-grid">
+                  {TOPICS.map((topic) => {
+                    const selected = interests.includes(topic);
+                    return (
+                      <button
+                        key={topic}
+                        type="button"
+                        className={`topic-chip${selected ? " selected" : ""}`}
+                        onClick={() => toggleInterest(topic)}
+                      >
+                        {topic}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {error && <p className="form-error fx fx-6">{error}</p>}
@@ -241,7 +339,7 @@ export default function CompleteProfile({ active, play, initialUsername, onSucce
                 {submitting ? "Saving…" : "Enter Haven"}
               </button>
 
-              <button type="button" className="ghost-btn fx fx-7" onClick={handleSkipAvatar} disabled={submitting}>
+              <button type="button" className="ghost-btn fx fx-7" onClick={handleSkip} disabled={submitting}>
                 Skip for now
               </button>
             </div>
