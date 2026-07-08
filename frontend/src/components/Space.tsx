@@ -15,13 +15,14 @@ import Den from "./Den";
 import Composer from "./Composer";
 import FlashCard from "./Flash";
 import VaultCard from "./Vault";
-import Feed from "./Feed";
+import Feed from "./feed";
+import ProfileSettings from "./ProfileSettings";
 
 interface SpaceProps {
   onLogout: () => void;
 }
 
-type Tab = "feed" | "space" | "trail" | "den";
+type Tab = "feed" | "space" | "trail" | "den" | "settings";
 
 export default function Space({ onLogout }: SpaceProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -122,23 +123,49 @@ export default function Space({ onLogout }: SpaceProps) {
             Haven<span className="dot" style={{ color: "var(--cherry-bright)" }}>・</span>
           </div>
 
-          <div
+          <button
+            type="button"
+            onClick={() => setTab("settings")}
+            title="Edit your profile"
             style={{
               background: "#fff",
               borderRadius: 18,
-              border: "1px solid var(--line)",
+              border: tab === "settings" ? "1px solid var(--cherry)" : "1px solid var(--line)",
               padding: "20px 16px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               textAlign: "center",
               boxShadow: "0 4px 16px rgba(196,24,60,0.04)",
+              cursor: "pointer",
+              position: "relative",
+              transition: "border-color 0.2s ease, transform 0.15s ease",
             }}
           >
+            <span
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                width: 22,
+                height: 22,
+                borderRadius: "50%",
+                background: "var(--blush-soft)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--cherry)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+              </svg>
+            </span>
             <div style={{ width: 60, height: 60, borderRadius: "50%", overflow: "hidden", border: "2px solid var(--cherry)", marginBottom: 12 }}>
               <img src={avatar} alt={displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
-            <h3 style={{ margin: "0 0 4px", fontSize: 16, color: "var(--ink)" }}>{displayName}</h3>
+            <h3 style={{ margin: "0 0 4px", fontSize: 16, color: "var(--ink)", fontFamily: "'Shippori Mincho', serif" }}>{displayName}</h3>
             <p style={{ margin: "0 0 10px", fontSize: 12, color: "var(--ink-muted)" }}>@{username}</p>
             {profile?.bio && <p style={{ margin: "0 0 10px", fontSize: 12, color: "var(--ink)" }}>{profile.bio}</p>}
 
@@ -152,13 +179,14 @@ export default function Space({ onLogout }: SpaceProps) {
                 <span style={{ color: "var(--ink-muted)", fontSize: 10 }}>Tended</span>
               </div>
             </div>
-          </div>
+          </button>
 
           <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {navItem("feed", "Everyone's Flashes & Blurts")}
             {navItem("space", "My Space")}
             {navItem("trail", "Trail")}
             {navItem("den", "Den")}
+            {navItem("settings", "Profile Settings")}
           </nav>
         </div>
 
@@ -241,6 +269,16 @@ export default function Space({ onLogout }: SpaceProps) {
             <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Den</h1>
             <Den myId={profile.id} />
           </>
+        )}
+
+        {tab === "settings" && profile && (
+          <ProfileSettings
+            profile={{ ...profile, karma: counts.tenders }}
+            onBack={() => setTab("feed")}
+            onUpdated={(updated) =>
+              setProfile((prev) => (prev ? ({ ...prev, ...updated } as Profile) : prev))
+            }
+          />
         )}
       </main>
     </div>

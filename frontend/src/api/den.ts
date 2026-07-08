@@ -62,6 +62,28 @@ export async function fetchConversations() {
   return data;
 }
 
+/**
+ * The single most recent message in each of the given conversations, keyed
+ * by conversation_id. Used to render an inbox-style preview line under each
+ * conversation without a per-conversation round trip.
+ */
+export async function fetchLatestMessages(conversationIds: string[]) {
+  if (conversationIds.length === 0) return {} as Record<string, Message>;
+
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .in("conversation_id", conversationIds)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
+  const latest: Record<string, Message> = {};
+  for (const m of data as Message[]) {
+    if (!latest[m.conversation_id]) latest[m.conversation_id] = m;
+  }
+  return latest;
+}
+
 export async function fetchMessages(conversationId: string) {
   const { data, error } = await supabase
     .from("messages")
@@ -91,4 +113,63 @@ export async function sendMessage(conversationId: string, body: string) {
     .eq("id", conversationId);
 
   return data as Message;
+}
+
+/**
+ * Opens one realtime channel per active conversation that both streams
+ * newly-inserted messages (so replies land live) and carries ephemeral
+ * "typing…" broadcasts between the two participants. Nothing here touches
+ * the database — typing pings are broadcast-only and never persisted.
+ * Returns `{ broadcastTyping, unsubscribe }`; always call unsubscribe on
+ * cleanup or when switching conversations.
+ */
+export function openConversationChannel(
+  conversationId: string,
+  handlers: { onMessage: (message: Message) => void; onTyping: (fromUserId: string) => void }
+) {
+  const channel = supabase
+    .channel(`den-convo-${conversationId}`)
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
+      (payload) => handlers.onMessage(payload.new as Message)
+    )
+    .on("broadcast", { event: "typing" }, (payload) => {
+      const fromUserId = payload.payload?.userId;
+      if (fromUserId) handlers.onTyping(fromUserId);
+    })
+    .subscribe();
+
+  return {
+    broadcastTyping(userId: string) {
+      channel.send({ type: "broadcast", event: "typing", payload: { userId } });
+    },
+    unsubscribe() {
+      supabase.removeChannel(channel);
+    },
+  };
+}
+
+/**
+ * A lightweight "who's around right now" presence channel shared by every
+ * open Den. Call once per session; returns an unsubscribe function. onSync
+ * fires with the current set of online user ids whenever presence changes.
+ */
+export function subscribeToPresence(myId: string, onSync: (onlineIds: Set<string>) => void) {
+  const channel = supabase.channel("den-presence", { config: { presence: { key: myId } } });
+
+  channel
+    .on("presence", { event: "sync" }, () => {
+      const state = channel.presenceState();
+      onSync(new Set(Object.keys(state)));
+    })
+    .subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        channel.track({ online_at: new Date().toISOString() });
+      }
+    });
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
 }

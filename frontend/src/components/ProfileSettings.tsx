@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
-import { updateProfile, getErrorMessage } from "../api/client";
+import { updateProfile, getErrorMessage } from "../api/auth";
+import { uploadAvatarImage } from "../api/storage";
 
 interface UserProfile {
   username: string;
@@ -15,6 +16,7 @@ interface UserProfile {
 interface ProfileSettingsProps {
   profile: UserProfile;
   onUpdated: (profile: UserProfile) => void;
+  onBack?: () => void;
 }
 
 const TOPICS = [
@@ -25,7 +27,7 @@ const TOPICS = [
 const BIO_LIMIT = 280;
 type Tab = "profile" | "avatar" | "account";
 
-export default function ProfileSettings({ profile, onUpdated }: ProfileSettingsProps) {
+export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileSettingsProps) {
   const [tab, setTab] = useState<Tab>("profile");
 
   const [displayName, setDisplayName] = useState(profile.display_name || "");
@@ -87,16 +89,19 @@ export default function ProfileSettings({ profile, onUpdated }: ProfileSettingsP
     setSuccess("");
     setSaving(true);
     try {
+      let avatar_url = profile.avatar_url;
+      if (avatarFile) {
+        avatar_url = await uploadAvatarImage(avatarFile);
+      }
       const updated = await updateProfile({
         username: username.trim(),
         display_name: displayName.trim(),
         bio: bio.trim(),
-        interests: interests.join(", "),
-        avatar_file: avatarFile,
+        avatar_url,
       });
       setAvatarFile(null);
       setSuccess("Your profile has been updated.");
-      onUpdated(updated);
+      onUpdated({ ...profile, ...updated, interests: interests.join(", ") });
     } catch (err: any) {
       setError(getErrorMessage(err, "Couldn't save your changes. Please try again."));
     } finally {
@@ -110,8 +115,17 @@ export default function ProfileSettings({ profile, onUpdated }: ProfileSettingsP
 
   return (
     <div className="settings-shell">
+      {onBack && (
+        <button type="button" className="back-link settings-back" onClick={onBack}>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Back to Haven
+        </button>
+      )}
       <div className="settings-head">
-        <h1>Settings</h1>
+        <span className="settings-eyebrow">Your Haven</span>
+        <h1>Profile Settings</h1>
         <p>Manage how you appear across Haven.</p>
       </div>
 
@@ -212,6 +226,9 @@ export default function ProfileSettings({ profile, onUpdated }: ProfileSettingsP
                   );
                 })}
               </div>
+              <span className="char-counter" style={{ alignSelf: "flex-start" }}>
+                Interests personalize your feed on this device — full sync is coming soon.
+              </span>
             </div>
           </div>
         )}
