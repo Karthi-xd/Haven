@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabaseClient";
 const BUCKET = "petal-media";
 
 /** Uploads a photo/video to the `petal-media` bucket and returns its public URL. */
-export async function uploadPetalMedia(file: File) {
+export async function uploadFlashMedia(file: File) {
   const {
     data: { user },
   } = await supabase.auth.getUser();

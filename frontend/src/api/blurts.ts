@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabaseClient";
-import type { Whisper } from "../types";
+import type { Blurt } from "../types";
 
-export async function fetchWhisperFeed(limit = 30) {
+export async function fetchBlurtFeed(limit = 30) {
   const { data, error } = await supabase
     .from("whispers_with_counts")
     .select("*")
@@ -9,20 +9,20 @@ export async function fetchWhisperFeed(limit = 30) {
     .order("posted_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return data as Whisper[];
+  return data as Blurt[];
 }
 
-export async function fetchGardenWhispers(authorId: string) {
+export async function fetchSpaceBlurts(authorId: string) {
   const { data, error } = await supabase
     .from("whispers_with_counts")
     .select("*")
     .eq("author_id", authorId)
     .order("posted_at", { ascending: false });
   if (error) throw error;
-  return data as Whisper[];
+  return data as Blurt[];
 }
 
-export async function createWhisper(body: string) {
+export async function createBlurt(body: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -34,11 +34,11 @@ export async function createWhisper(body: string) {
     .select()
     .single();
   if (error) throw error;
-  return data as Whisper;
+  return data as Blurt;
 }
 
-/** Let it linger: stops the 24h countdown and makes the Whisper permanent on the Garden. */
-export async function letWhisperLinger(id: string) {
+/** Let it linger: stops the 24h countdown and makes the Blurt permanent on the Space. */
+export async function letBlurtLinger(id: string) {
   const { data, error } = await supabase
     .from("whispers")
     .update({ lingering: true, expires_at: null })
@@ -46,10 +46,10 @@ export async function letWhisperLinger(id: string) {
     .select()
     .single();
   if (error) throw error;
-  return data as Whisper;
+  return data as Blurt;
 }
 
-export async function deleteWhisper(id: string) {
+export async function deleteBlurt(id: string) {
   const { error } = await supabase.from("whispers").delete().eq("id", id);
   if (error) throw error;
 }

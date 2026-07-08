@@ -1,8 +1,8 @@
 import { supabase } from "../lib/supabaseClient";
-import type { Knock, Message } from "../types";
+import type { Ping, Message } from "../types";
 
-/** Send a Knock — a pending message request at someone's Garden Gate. */
-export async function sendKnock(toId: string, openingMessage: string) {
+/** Send a Ping — a pending message request at someone's Den. */
+export async function sendPing(toId: string, openingMessage: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -14,11 +14,11 @@ export async function sendKnock(toId: string, openingMessage: string) {
     .select()
     .single();
   if (error) throw error;
-  return data as Knock;
+  return data as Ping;
 }
 
-/** Knocks waiting at my Garden Gate for me to approve or decline. */
-export async function fetchPendingKnocks() {
+/** Pings waiting at my Den for me to approve or decline. */
+export async function fetchPendingPings() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -31,18 +31,18 @@ export async function fetchPendingKnocks() {
     .eq("status", "pending")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return data as unknown as (Knock & { from: any })[];
+  return data as unknown as (Ping & { from: any })[];
 }
 
-/** Approve a Knock: opens the Gate — creates (or reuses) the Conversation. */
-export async function approveKnock(knockId: string) {
-  const { data, error } = await supabase.rpc("approve_knock", { knock_id: knockId });
+/** Approve a Ping: opens the Den — creates (or reuses) the Conversation. */
+export async function approvePing(pingId: string) {
+  const { data, error } = await supabase.rpc("approve_knock", { knock_id: pingId });
   if (error) throw error;
   return data;
 }
 
-export async function declineKnock(knockId: string) {
-  const { error } = await supabase.from("knocks").update({ status: "declined" }).eq("id", knockId);
+export async function declinePing(pingId: string) {
+  const { error } = await supabase.from("knocks").update({ status: "declined" }).eq("id", pingId);
   if (error) throw error;
 }
 

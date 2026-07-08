@@ -2,7 +2,7 @@ import { supabase, withTimeout } from "../lib/supabaseClient";
 import type { Profile } from "../types";
 
 /**
- * Generates a Garden username from the email's local part so the sign-up
+ * Generates a Space username from the email's local part so the sign-up
  * form doesn't need to ask for one. Not guaranteed unique on its own — a
  * random 4-digit suffix keeps collisions unlikely, and the duplicate-key
  * catch below handles the rare case where one still happens.
@@ -15,7 +15,7 @@ function generateUsernameFromEmail(email: string): string {
 }
 
 /**
- * Creates this user's Garden profile row if it doesn't already exist.
+ * Creates this user's Space profile row if it doesn't already exist.
  *
  * IMPORTANT: this must only ever be called while a real session is active.
  * Supabase's Row Level Security checks `auth.uid()` against the row being
@@ -61,7 +61,7 @@ async function ensureProfile(userId: string, email: string) {
  * A username/display name is generated automatically from the email.
  *
  * If Supabase returns a session immediately (email confirmation disabled),
- * the Garden profile is created right here. If not (email confirmation
+ * the Space profile is created right here. If not (email confirmation
  * required), the profile is created the moment a session first exists —
  * i.e. in loginHaven, right after the user confirms their email and logs in.
  */
@@ -85,7 +85,7 @@ export async function loginHaven(email: string, password: string) {
   if (error) throw error;
 
   // A session is now guaranteed to exist, so it's always safe to make sure
-  // the Garden profile row is there (covers the "email confirmation was
+  // the Space profile row is there (covers the "email confirmation was
   // required" case, where registerHaven couldn't create it yet).
   if (data.user) {
     await ensureProfile(data.user.id, email);

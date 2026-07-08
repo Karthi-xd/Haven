@@ -1,8 +1,8 @@
 import { supabase } from "../lib/supabaseClient";
-import type { ReactableKind, Sprout } from "../types";
+import type { ReactableKind, Chime } from "../types";
 
-/** Fetch every Sprout (comment) growing off a Petal or Whisper, oldest first. */
-export async function fetchSprouts(targetKind: ReactableKind, targetId: string) {
+/** Fetch every Chime (comment) growing off a Flash or Blurt, oldest first. */
+export async function fetchChimes(targetKind: ReactableKind, targetId: string) {
   const { data, error } = await supabase
     .from("sprouts")
     .select("*, author:profiles(*)")
@@ -10,10 +10,10 @@ export async function fetchSprouts(targetKind: ReactableKind, targetId: string) 
     .eq("target_id", targetId)
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return data as unknown as Sprout[];
+  return data as unknown as Chime[];
 }
 
-export async function createSprout(
+export async function createChime(
   targetKind: ReactableKind,
   targetId: string,
   body: string,
@@ -36,10 +36,10 @@ export async function createSprout(
     .select("*, author:profiles(*)")
     .single();
   if (error) throw error;
-  return data as unknown as Sprout;
+  return data as unknown as Chime;
 }
 
-export async function deleteSprout(id: string) {
+export async function deleteChime(id: string) {
   const { error } = await supabase.from("sprouts").delete().eq("id", id);
   if (error) throw error;
 }

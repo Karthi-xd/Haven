@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { toggleTouch } from "../api/reactions";
+import { toggleBuzz } from "../api/reactions";
 import type { ReactableKind } from "../types";
 
-interface TouchProps {
+interface BuzzProps {
   targetKind: ReactableKind;
   targetId: string;
   count: number;
   active?: boolean;
 }
 
-export default function Touch({ targetKind, targetId, count: initialCount, active: initialActive = false }: TouchProps) {
+export default function Buzz({ targetKind, targetId, count: initialCount, active: initialActive = false }: BuzzProps) {
   const [active, setActive] = useState(initialActive);
   const [count, setCount] = useState(initialCount);
   const [busy, setBusy] = useState(false);
@@ -21,7 +21,7 @@ export default function Touch({ targetKind, targetId, count: initialCount, activ
     setActive(next);
     setCount((c) => c + (next ? 1 : -1));
     try {
-      await toggleTouch(targetKind, targetId);
+      await toggleBuzz(targetKind, targetId);
     } catch {
       // roll back on failure
       setActive(!next);
@@ -36,7 +36,7 @@ export default function Touch({ targetKind, targetId, count: initialCount, activ
       type="button"
       onClick={handleClick}
       aria-pressed={active}
-      title="Touch"
+      title="Buzz"
       style={{
         display: "inline-flex",
         alignItems: "center",

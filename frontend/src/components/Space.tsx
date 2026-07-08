@@ -1,69 +1,69 @@
 import { useEffect, useState } from "react";
 import { fetchMe } from "../api/auth";
-import { fetchGardenPetals } from "../api/petals";
-import { fetchGardenWhispers } from "../api/whispers";
-import { fetchPetalFeed } from "../api/petals";
-import { fetchWhisperFeed } from "../api/whispers";
-import { fetchMyBlooms } from "../api/blooms";
+import { fetchSpaceFlashes } from "../api/flashes";
+import { fetchSpaceBlurts } from "../api/blurts";
+import { fetchFlashFeed } from "../api/flashes";
+import { fetchBlurtFeed } from "../api/blurts";
+import { fetchMyVaults } from "../api/vaults";
 import { fetchTendingCounts } from "../api/tending";
-import type { Profile, Petal as PetalType, Whisper as WhisperType, Bloom as BloomType } from "../types";
+import type { Profile, Flash as FlashType, Blurt as BlurtType, Vault as VaultType } from "../types";
 import LoadingScene from "./LoadingScene";
-import MorningDew from "./MorningDew";
-import GardenGrid from "./GardenGrid";
-import PetalPath from "./PetalPath";
-import GardenGate from "./GardenGate";
+import Wake from "./Wake";
+import SpaceGrid from "./SpaceGrid";
+import Trail from "./Trail";
+import Den from "./Den";
 import Composer from "./Composer";
-import PetalCard from "./Petal";
-import WhisperCard from "./Whisper";
-import BloomCard from "./Bloom";
+import FlashCard from "./Flash";
+import BlurtCard from "./Blurt";
+import VaultCard from "./Vault";
 
-interface GardenProps {
+interface SpaceProps {
   onLogout: () => void;
 }
 
-type Tab = "feed" | "garden" | "path" | "gate";
+type Tab = "feed" | "space" | "trail" | "den";
 
-export default function Garden({ onLogout }: GardenProps) {
+export default function Space({ onLogout }: SpaceProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("feed");
 
-  const [myPetals, setMyPetals] = useState<PetalType[]>([]);
-  const [myWhispers, setMyWhispers] = useState<WhisperType[]>([]);
-  const [myBlooms, setMyBlooms] = useState<BloomType[]>([]);
-  const [feedPetals, setFeedPetals] = useState<PetalType[]>([]);
-  const [feedWhispers, setFeedWhispers] = useState<WhisperType[]>([]);
+  const [myFlashes, setMyFlashes] = useState<FlashType[]>([]);
+  const [myBlurts, setMyBlurts] = useState<BlurtType[]>([]);
+  const [myVaults, setMyVaults] = useState<VaultType[]>([]);
+  const [feedFlashes, setFeedFlashes] = useState<FlashType[]>([]);
+  const [feedBlurts, setFeedBlurts] = useState<BlurtType[]>([]);
   const [counts, setCounts] = useState({ tenders: 0, tended: 0 });
-  const [selectedPetal, setSelectedPetal] = useState<PetalType | null>(null);
+  const [selectedFlash, setSelectedFlash] = useState<FlashType | null>(null);
 
   useEffect(() => {
     fetchMe()
       .then(async (me) => {
         setProfile(me);
         if (me) {
-          const [petals, whispers, blooms, tendingCounts] = await Promise.all([
-            fetchGardenPetals(me.id),
-            fetchGardenWhispers(me.id),
-            fetchMyBlooms(),
+          const [flashes, blurts, vaults, tendingCounts] = await Promise.all([
+            fetchSpaceFlashes(me.id),
+            fetchSpaceBlurts(me.id),
+            fetchMyVaults(),
             fetchTendingCounts(me.id),
           ]);
-          setMyPetals(petals);
-          setMyWhispers(whispers);
-          setMyBlooms(blooms);
+          setMyFlashes(flashes);
+          setMyBlurts(blurts);
+          setMyVaults(vaults);
           setCounts(tendingCounts);
         }
-        const [fp, fw] = await Promise.all([fetchPetalFeed(), fetchWhisperFeed()]);
-        setFeedPetals(fp);
-        setFeedWhispers(fw);
+        const [fp, fw] = await Promise.all([fetchFlashFeed(), fetchBlurtFeed()]);
+        setFeedFlashes(fp);
+        setFeedBlurts(fw);
       })
       .finally(() => setLoading(false));
   }, []);
 
   function refreshMine() {
     if (!profile) return;
-    fetchGardenPetals(profile.id).then(setMyPetals);
-    fetchGardenWhispers(profile.id).then(setMyWhispers);
-    fetchMyBlooms().then(setMyBlooms);
+    fetchSpaceFlashes(profile.id).then(setMyFlashes);
+    fetchSpaceBlurts(profile.id).then(setMyBlurts);
+    fetchMyVaults().then(setMyVaults);
   }
 
   if (loading) return <LoadingScene />;
@@ -102,7 +102,7 @@ export default function Garden({ onLogout }: GardenProps) {
         fontFamily: "Zen Kaku Gothic New, sans-serif",
       }}
     >
-      <MorningDew />
+      <Wake />
 
       {/* SIDEBAR */}
       <aside
@@ -155,10 +155,10 @@ export default function Garden({ onLogout }: GardenProps) {
           </div>
 
           <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {navItem("feed", "Everyone's Petals & Whispers")}
-            {navItem("garden", "My Garden")}
-            {navItem("path", "Petal Path")}
-            {navItem("gate", "Garden Gate")}
+            {navItem("feed", "Everyone's Flashes & Blurts")}
+            {navItem("space", "My Space")}
+            {navItem("trail", "Trail")}
+            {navItem("den", "Den")}
           </nav>
         </div>
 
@@ -194,52 +194,52 @@ export default function Garden({ onLogout }: GardenProps) {
             </div>
 
             <Composer
-              onPetalCreated={(p) => setMyPetals((prev) => [p, ...prev])}
-              onWhisperCreated={(w) => { setMyWhispers((prev) => [w, ...prev]); setFeedWhispers((prev) => [w, ...prev]); }}
-              onBloomCreated={refreshMine}
+              onFlashCreated={(p) => setMyFlashes((prev) => [p, ...prev])}
+              onBlurtCreated={(w) => { setMyBlurts((prev) => [w, ...prev]); setFeedBlurts((prev) => [w, ...prev]); }}
+              onVaultCreated={refreshMine}
             />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 640 }}>
-              {feedWhispers.map((w) => <WhisperCard key={w.id} whisper={w} isOwn={w.author.id === profile?.id} />)}
-              {feedPetals.map((p) => <PetalCard key={p.id} petal={p} />)}
-              {feedPetals.length === 0 && feedWhispers.length === 0 && (
+              {feedBlurts.map((w) => <BlurtCard key={w.id} blurt={w} isOwn={w.author.id === profile?.id} />)}
+              {feedFlashes.map((p) => <FlashCard key={p.id} flash={p} />)}
+              {feedFlashes.length === 0 && feedBlurts.length === 0 && (
                 <p style={{ color: "var(--ink-muted)", fontSize: 13.5 }}>Nothing's alive right now — be the first to plant something today.</p>
               )}
             </div>
           </>
         )}
 
-        {tab === "garden" && (
+        {tab === "space" && (
           <>
-            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Garden</h1>
-            <GardenGrid petals={myPetals} whispers={myWhispers} onSelectPetal={setSelectedPetal} />
-            {myBlooms.length > 0 && (
+            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
+            <SpaceGrid flashes={myFlashes} blurts={myBlurts} onSelectFlash={setSelectedFlash} />
+            {myVaults.length > 0 && (
               <div>
-                <h3 style={{ fontSize: 14, color: "var(--ink-muted)", margin: "20px 0 10px" }}>Sealed Blooms</h3>
+                <h3 style={{ fontSize: 14, color: "var(--ink-muted)", margin: "20px 0 10px" }}>Sealed Vaults</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
-                  {myBlooms.map((b) => <BloomCard key={b.id} bloom={b} onDeleted={refreshMine} />)}
+                  {myVaults.map((b) => <VaultCard key={b.id} vault={b} onDeleted={refreshMine} />)}
                 </div>
               </div>
             )}
-            {selectedPetal && (
+            {selectedFlash && (
               <div style={{ maxWidth: 420, marginTop: 12 }}>
-                <PetalCard petal={selectedPetal} />
+                <FlashCard flash={selectedFlash} />
               </div>
             )}
           </>
         )}
 
-        {tab === "path" && profile && (
+        {tab === "trail" && profile && (
           <>
-            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Petal Path</h1>
-            <PetalPath authorId={profile.id} />
+            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Trail</h1>
+            <Trail authorId={profile.id} />
           </>
         )}
 
-        {tab === "gate" && profile && (
+        {tab === "den" && profile && (
           <>
-            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Garden Gate</h1>
-            <GardenGate myId={profile.id} />
+            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Den</h1>
+            <Den myId={profile.id} />
           </>
         )}
       </main>

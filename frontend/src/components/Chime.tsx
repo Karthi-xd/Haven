@@ -1,22 +1,22 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { fetchSprouts, createSprout } from "../api/sprouts";
-import type { ReactableKind, Sprout as SproutType } from "../types";
+import { fetchChimes, createChime } from "../api/chimes";
+import type { ReactableKind, Chime as ChimeType } from "../types";
 
-interface SproutProps {
+interface ChimeProps {
   targetKind: ReactableKind;
   targetId: string;
 }
 
-/** The comment thread growing off a single Petal or Whisper. */
-export default function Sprout({ targetKind, targetId }: SproutProps) {
-  const [sprouts, setSprouts] = useState<SproutType[]>([]);
+/** The comment thread growing off a single Flash or Blurt. */
+export default function Chime({ targetKind, targetId }: ChimeProps) {
+  const [chimes, setChimes] = useState<ChimeType[]>([]);
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    fetchSprouts(targetKind, targetId)
-      .then(setSprouts)
+    fetchChimes(targetKind, targetId)
+      .then(setChimes)
       .finally(() => setLoading(false));
   }, [targetKind, targetId]);
 
@@ -26,8 +26,8 @@ export default function Sprout({ targetKind, targetId }: SproutProps) {
     if (!trimmed || posting) return;
     setPosting(true);
     try {
-      const created = await createSprout(targetKind, targetId, trimmed);
-      setSprouts((prev) => [...prev, created]);
+      const created = await createChime(targetKind, targetId, trimmed);
+      setChimes((prev) => [...prev, created]);
       setBody("");
     } finally {
       setPosting(false);
@@ -37,9 +37,9 @@ export default function Sprout({ targetKind, targetId }: SproutProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
       {loading ? (
-        <p style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>Loading sprouts…</p>
+        <p style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>Loading chimes…</p>
       ) : (
-        sprouts.map((s) => (
+        chimes.map((s) => (
           <div key={s.id} style={{ display: "flex", gap: 8, fontSize: 13 }}>
             <span style={{ fontWeight: 700, color: "var(--cherry)" }}>@{s.author.username}</span>
             <span style={{ color: "var(--ink)" }}>{s.body}</span>
@@ -51,7 +51,7 @@ export default function Sprout({ targetKind, targetId }: SproutProps) {
         <input
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Grow a Sprout…"
+          placeholder="Add a Chime…"
           maxLength={280}
           style={{
             flex: 1,
@@ -77,7 +77,7 @@ export default function Sprout({ targetKind, targetId }: SproutProps) {
             opacity: posting || !body.trim() ? 0.6 : 1,
           }}
         >
-          Sprout
+          Chime
         </button>
       </form>
     </div>

@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { toggleRootbloom } from "../api/reactions";
+import { toggleSpark } from "../api/reactions";
 import type { ReactableKind } from "../types";
 
-interface RootbloomProps {
+interface SparkProps {
   targetKind: ReactableKind;
   targetId: string;
   count: number;
   active?: boolean;
 }
 
-/** Rare reaction: "this genuinely changed how I see things." Visually distinct from a Touch. */
-export default function Rootbloom({ targetKind, targetId, count: initialCount, active: initialActive = false }: RootbloomProps) {
+/** Rare reaction: "this genuinely changed how I see things." Visually distinct from a Buzz. */
+export default function Spark({ targetKind, targetId, count: initialCount, active: initialActive = false }: SparkProps) {
   const [active, setActive] = useState(initialActive);
   const [count, setCount] = useState(initialCount);
   const [busy, setBusy] = useState(false);
@@ -22,7 +22,7 @@ export default function Rootbloom({ targetKind, targetId, count: initialCount, a
     setActive(next);
     setCount((c) => c + (next ? 1 : -1));
     try {
-      await toggleRootbloom(targetKind, targetId);
+      await toggleSpark(targetKind, targetId);
     } catch {
       setActive(!next);
       setCount((c) => c + (next ? -1 : 1));
@@ -36,7 +36,7 @@ export default function Rootbloom({ targetKind, targetId, count: initialCount, a
       type="button"
       onClick={handleClick}
       aria-pressed={active}
-      title="Rootbloom — this changed how I see things"
+      title="Spark — this changed how I see things"
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -53,7 +53,7 @@ export default function Rootbloom({ targetKind, targetId, count: initialCount, a
       }}
     >
       <span aria-hidden="true">🌺</span>
-      <span>{count > 0 ? count : "Rootbloom"}</span>
+      <span>{count > 0 ? count : "Spark"}</span>
     </button>
   );
 }

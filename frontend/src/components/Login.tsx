@@ -95,7 +95,7 @@ export default function Login({ active, play, onBack, onSuccess, onSignUp }: Log
               <br />
               back.
             </h1>
-            <p className="sub">Your Garden is waiting. Pick up where you left off.</p>
+            <p className="sub">Your Space is waiting. Pick up where you left off.</p>
           </div>
 
           <form onSubmit={handleSubmit}>

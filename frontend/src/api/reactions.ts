@@ -9,8 +9,8 @@ async function currentUserId() {
   return user.id;
 }
 
-/** Toggle a lightweight positive Touch on a Petal or Whisper. */
-export async function toggleTouch(targetKind: ReactableKind, targetId: string) {
+/** Toggle a lightweight positive Buzz on a Flash or Blurt. */
+export async function toggleBuzz(targetKind: ReactableKind, targetId: string) {
   const userId = await currentUserId();
   const { data: existing } = await supabase
     .from("touches")
@@ -32,8 +32,8 @@ export async function toggleTouch(targetKind: ReactableKind, targetId: string) {
   return { active: true };
 }
 
-/** Toggle a Wilt (the negative reaction) on a Petal or Whisper. */
-export async function toggleWilt(targetKind: ReactableKind, targetId: string) {
+/** Toggle a Strike (the negative reaction) on a Flash or Blurt. */
+export async function toggleStrike(targetKind: ReactableKind, targetId: string) {
   const userId = await currentUserId();
   const { data: existing } = await supabase
     .from("wilts")
@@ -55,8 +55,8 @@ export async function toggleWilt(targetKind: ReactableKind, targetId: string) {
   return { active: true };
 }
 
-/** Toggle a Rootbloom — the rare "this changed how I see things" reaction. */
-export async function toggleRootbloom(targetKind: ReactableKind, targetId: string) {
+/** Toggle a Spark — the rare "this changed how I see things" reaction. */
+export async function toggleSpark(targetKind: ReactableKind, targetId: string) {
   const userId = await currentUserId();
   const { data: existing } = await supabase
     .from("rootblooms")

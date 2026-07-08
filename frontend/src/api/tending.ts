@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabaseClient";
 
-/** Start Tending someone's Garden (follow). */
-export async function tendGarden(tendedId: string) {
+/** Start Tending someone's Space (follow). */
+export async function tendSpace(tendedId: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -11,8 +11,8 @@ export async function tendGarden(tendedId: string) {
   if (error) throw error;
 }
 
-/** Stop Tending someone's Garden (unfollow). */
-export async function untendGarden(tendedId: string) {
+/** Stop Tending someone's Space (unfollow). */
+export async function untendSpace(tendedId: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -41,30 +41,30 @@ export async function isTending(tendedId: string) {
   return !!data;
 }
 
-/** People tending this Garden (followers). */
-export async function fetchTenders(gardenId: string) {
+/** People tending this Space (followers). */
+export async function fetchTenders(spaceId: string) {
   const { data, error } = await supabase
     .from("tending")
     .select("tender:profiles!tending_tender_id_fkey(*)")
-    .eq("tended_id", gardenId);
+    .eq("tended_id", spaceId);
   if (error) throw error;
   return (data ?? []).map((row: any) => row.tender);
 }
 
-/** Gardens this profile tends (following). */
-export async function fetchTended(gardenId: string) {
+/** Spaces this profile tends (following). */
+export async function fetchTended(spaceId: string) {
   const { data, error } = await supabase
     .from("tending")
     .select("tended:profiles!tending_tended_id_fkey(*)")
-    .eq("tender_id", gardenId);
+    .eq("tender_id", spaceId);
   if (error) throw error;
   return (data ?? []).map((row: any) => row.tended);
 }
 
-export async function fetchTendingCounts(gardenId: string) {
+export async function fetchTendingCounts(spaceId: string) {
   const [{ count: tenders }, { count: tended }] = await Promise.all([
-    supabase.from("tending").select("id", { count: "exact", head: true }).eq("tended_id", gardenId),
-    supabase.from("tending").select("id", { count: "exact", head: true }).eq("tender_id", gardenId),
+    supabase.from("tending").select("id", { count: "exact", head: true }).eq("tended_id", spaceId),
+    supabase.from("tending").select("id", { count: "exact", head: true }).eq("tender_id", spaceId),
   ]);
   return { tenders: tenders ?? 0, tended: tended ?? 0 };
 }

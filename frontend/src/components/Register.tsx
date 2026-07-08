@@ -55,8 +55,8 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
     setError("");
     setSubmitting(true);
     try {
-      // One step: account + Garden profile are created together.
-      // No profile-setup screen afterward — straight to the Garden.
+      // One step: account + Space profile are created together.
+      // No profile-setup screen afterward — straight to the Space.
       await registerHaven(trimmedEmail, password);
       await loginHaven(trimmedEmail, password);
       onSuccess();
@@ -100,7 +100,7 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
               <br />
               account.
             </h1>
-            <p className="sub">Welcome to Haven. Plant your Garden in a minute.</p>
+            <p className="sub">Welcome to Haven. Plant your Space in a minute.</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -166,7 +166,7 @@ export default function Register({ active, play, onBack, onSuccess, onLogin }: R
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2c-1.8 0-2 1.6-2.6 2.3C6.5 6.7 4 9.6 4 13c0 3.6 2.8 6.6 6.4 7.8.5.2 1.1.2 1.6 0C15.6 19.6 18.4 16.6 18.4 13c0-3.4-2.5-6.3-5.4-8.7C12.4 3.6 12.2 2 12 2z" />
               </svg>
-              {submitting ? "Planting your Garden…" : "Create account"}
+              {submitting ? "Planting your Space…" : "Create account"}
             </button>
           </form>
 

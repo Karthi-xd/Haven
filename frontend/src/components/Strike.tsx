@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { toggleWilt } from "../api/reactions";
+import { toggleStrike } from "../api/reactions";
 import type { ReactableKind } from "../types";
 
-interface WiltProps {
+interface StrikeProps {
   targetKind: ReactableKind;
   targetId: string;
   active?: boolean;
 }
 
-/** The negative counterpart to a Touch — quiet, not punitive. No public count shown. */
-export default function Wilt({ targetKind, targetId, active: initialActive = false }: WiltProps) {
+/** The negative counterpart to a Buzz — quiet, not punitive. No public count shown. */
+export default function Strike({ targetKind, targetId, active: initialActive = false }: StrikeProps) {
   const [active, setActive] = useState(initialActive);
   const [busy, setBusy] = useState(false);
 
@@ -19,7 +19,7 @@ export default function Wilt({ targetKind, targetId, active: initialActive = fal
     const next = !active;
     setActive(next);
     try {
-      await toggleWilt(targetKind, targetId);
+      await toggleStrike(targetKind, targetId);
     } catch {
       setActive(!next);
     } finally {
@@ -32,7 +32,7 @@ export default function Wilt({ targetKind, targetId, active: initialActive = fal
       type="button"
       onClick={handleClick}
       aria-pressed={active}
-      title="Wilt"
+      title="Strike"
       style={{
         display: "inline-flex",
         alignItems: "center",

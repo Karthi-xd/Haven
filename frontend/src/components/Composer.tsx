@@ -1,16 +1,16 @@
 import { useState, type FormEvent } from "react";
-import { createPetal } from "../api/petals";
-import { createWhisper } from "../api/whispers";
-import { createBloom } from "../api/blooms";
-import { uploadPetalMedia } from "../api/storage";
-import type { Petal, Whisper } from "../types";
+import { createFlash } from "../api/flashes";
+import { createBlurt } from "../api/blurts";
+import { createVault } from "../api/vaults";
+import { uploadFlashMedia } from "../api/storage";
+import type { Flash, Blurt } from "../types";
 
-type Mode = "petal" | "whisper" | "bloom";
+type Mode = "flash" | "blurt" | "vault";
 
 interface ComposerProps {
-  onPetalCreated?: (p: Petal) => void;
-  onWhisperCreated?: (w: Whisper) => void;
-  onBloomCreated?: () => void;
+  onFlashCreated?: (p: Flash) => void;
+  onBlurtCreated?: (w: Blurt) => void;
+  onVaultCreated?: () => void;
 }
 
 const tabStyle = (active: boolean): React.CSSProperties => ({
@@ -24,11 +24,11 @@ const tabStyle = (active: boolean): React.CSSProperties => ({
   cursor: "pointer",
 });
 
-export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCreated }: ComposerProps) {
-  const [mode, setMode] = useState<Mode>("whisper");
+export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreated }: ComposerProps) {
+  const [mode, setMode] = useState<Mode>("blurt");
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
-  const [whisperBody, setWhisperBody] = useState("");
+  const [blurtBody, setBlurtBody] = useState("");
   const [unlocksAt, setUnlocksAt] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [followersOnly, setFollowersOnly] = useState(false); // deliberately buried
@@ -40,26 +40,26 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
     setError("");
     setSubmitting(true);
     try {
-      if (mode === "whisper") {
-        const trimmed = whisperBody.trim();
+      if (mode === "blurt") {
+        const trimmed = blurtBody.trim();
         if (!trimmed) throw new Error("Say something first.");
-        const w = await createWhisper(trimmed);
-        setWhisperBody("");
-        onWhisperCreated?.(w);
-      } else if (mode === "petal") {
+        const w = await createBlurt(trimmed);
+        setBlurtBody("");
+        onBlurtCreated?.(w);
+      } else if (mode === "flash") {
         if (!file) throw new Error("Choose a photo or video first.");
-        const media_url = await uploadPetalMedia(file);
+        const media_url = await uploadFlashMedia(file);
         const media_kind = file.type.startsWith("video") ? "video" : "image";
-        const p = await createPetal({ media_url, media_kind, caption, followers_only: followersOnly });
+        const p = await createFlash({ media_url, media_kind, caption, followers_only: followersOnly });
         setFile(null);
         setCaption("");
-        onPetalCreated?.(p);
+        onFlashCreated?.(p);
       } else {
         if (!file) throw new Error("Choose a photo or video first.");
         if (!unlocksAt) throw new Error("Pick a date and time for it to unlock.");
-        const media_url = await uploadPetalMedia(file);
+        const media_url = await uploadFlashMedia(file);
         const media_kind = file.type.startsWith("video") ? "video" : "image";
-        await createBloom({
+        await createVault({
           media_url,
           media_kind,
           caption,
@@ -69,7 +69,7 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
         setFile(null);
         setCaption("");
         setUnlocksAt("");
-        onBloomCreated?.();
+        onVaultCreated?.();
       }
     } catch (err: any) {
       setError(err?.message ?? "Something went wrong.");
@@ -91,24 +91,24 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
       }}
     >
       <div style={{ display: "flex", gap: 8 }}>
-        <button type="button" style={tabStyle(mode === "whisper")} onClick={() => setMode("whisper")}>Whisper</button>
-        <button type="button" style={tabStyle(mode === "petal")} onClick={() => setMode("petal")}>Petal</button>
-        <button type="button" style={tabStyle(mode === "bloom")} onClick={() => setMode("bloom")}>Bloom</button>
+        <button type="button" style={tabStyle(mode === "blurt")} onClick={() => setMode("blurt")}>Blurt</button>
+        <button type="button" style={tabStyle(mode === "flash")} onClick={() => setMode("flash")}>Flash</button>
+        <button type="button" style={tabStyle(mode === "vault")} onClick={() => setMode("vault")}>Vault</button>
       </div>
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {mode === "whisper" && (
+        {mode === "blurt" && (
           <textarea
-            value={whisperBody}
-            onChange={(e) => setWhisperBody(e.target.value)}
+            value={blurtBody}
+            onChange={(e) => setBlurtBody(e.target.value)}
             maxLength={280}
-            placeholder="Whisper something... it falls in 24h unless you let it linger."
+            placeholder="Blurt something... it falls in 24h unless you let it linger."
             rows={3}
             style={{ border: "1px solid var(--line)", borderRadius: 14, padding: 12, fontSize: 14, resize: "vertical" }}
           />
         )}
 
-        {(mode === "petal" || mode === "bloom") && (
+        {(mode === "flash" || mode === "vault") && (
           <>
             <input
               type="file"
@@ -125,7 +125,7 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
           </>
         )}
 
-        {mode === "bloom" && (
+        {mode === "vault" && (
           <label style={{ fontSize: 12.5, color: "var(--ink-muted)", display: "flex", flexDirection: "column", gap: 4 }}>
             Unlocks at
             <input
@@ -137,7 +137,7 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
           </label>
         )}
 
-        {(mode === "petal" || mode === "bloom") && (
+        {(mode === "flash" || mode === "vault") && (
           <div>
             <button
               type="button"
@@ -149,7 +149,7 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
             {showAdvanced && (
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "var(--ink-muted)", marginTop: 6 }}>
                 <input type="checkbox" checked={followersOnly} onChange={(e) => setFollowersOnly(e.target.checked)} />
-                Restrict this {mode === "bloom" ? "Bloom" : "Petal"} to followers only
+                Restrict this {mode === "vault" ? "Vault" : "Flash"} to followers only
               </label>
             )}
           </div>
@@ -173,7 +173,7 @@ export default function Composer({ onPetalCreated, onWhisperCreated, onBloomCrea
             opacity: submitting ? 0.7 : 1,
           }}
         >
-          {submitting ? "Planting…" : mode === "whisper" ? "Whisper it" : mode === "petal" ? "Let it fall" : "Seal the Bloom"}
+          {submitting ? "Planting…" : mode === "blurt" ? "Blurt it" : mode === "flash" ? "Let it fall" : "Seal the Vault"}
         </button>
       </form>
     </div>

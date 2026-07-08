@@ -1,18 +1,18 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
-  fetchPendingKnocks,
-  approveKnock,
-  declineKnock,
+  fetchPendingPings,
+  approvePing,
+  declinePing,
   fetchConversations,
   fetchMessages,
   sendMessage,
-} from "../api/gardenGate";
-import Knock from "./Knock";
+} from "../api/den";
+import Ping from "./Ping";
 import type { Message } from "../types";
 
-/** Garden Gate — standard messaging, but every new conversation starts as a Knock to approve. */
-export default function GardenGate({ myId }: { myId: string }) {
-  const [knocks, setKnocks] = useState<any[]>([]);
+/** Den — standard messaging, but every new conversation starts as a Ping to approve. */
+export default function Den({ myId }: { myId: string }) {
+  const [pings, setPings] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
   const [activeConvo, setActiveConvo] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,9 +21,9 @@ export default function GardenGate({ myId }: { myId: string }) {
 
   function loadAll() {
     setLoading(true);
-    Promise.all([fetchPendingKnocks(), fetchConversations()])
+    Promise.all([fetchPendingPings(), fetchConversations()])
       .then(([k, c]) => {
-        setKnocks(k);
+        setPings(k);
         setConversations(c ?? []);
       })
       .finally(() => setLoading(false));
@@ -39,13 +39,13 @@ export default function GardenGate({ myId }: { myId: string }) {
   }, [activeConvo]);
 
   async function handleApprove(id: string) {
-    await approveKnock(id);
+    await approvePing(id);
     loadAll();
   }
 
   async function handleDecline(id: string) {
-    await declineKnock(id);
-    setKnocks((prev) => prev.filter((k) => k.id !== id));
+    await declinePing(id);
+    setPings((prev) => prev.filter((k) => k.id !== id));
   }
 
   async function handleSend(e: FormEvent) {
@@ -57,19 +57,19 @@ export default function GardenGate({ myId }: { myId: string }) {
     setDraft("");
   }
 
-  if (loading) return <p style={{ color: "var(--ink-muted)", fontSize: 13 }}>Opening the Gate…</p>;
+  if (loading) return <p style={{ color: "var(--ink-muted)", fontSize: 13 }}>Opening the Den…</p>;
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 20, minHeight: 320 }}>
       <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {knocks.length > 0 && (
+        {pings.length > 0 && (
           <div>
             <h4 style={{ fontSize: 12, color: "var(--cherry)", textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 8px" }}>
-              Knocks waiting
+              Pings waiting
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {knocks.map((k) => (
-                <Knock key={k.id} knock={k} onApprove={handleApprove} onDecline={handleDecline} />
+              {pings.map((k) => (
+                <Ping key={k.id} ping={k} onApprove={handleApprove} onDecline={handleDecline} />
               ))}
             </div>
           </div>

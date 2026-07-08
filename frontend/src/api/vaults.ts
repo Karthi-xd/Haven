@@ -1,8 +1,8 @@
 import { supabase } from "../lib/supabaseClient";
-import type { Bloom } from "../types";
+import type { Vault } from "../types";
 
-/** A user's own sealed Blooms — never shown to anyone else while sealed. */
-export async function fetchMyBlooms() {
+/** A user's own sealed Vaults — never shown to anyone else while sealed. */
+export async function fetchMyVaults() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -14,10 +14,10 @@ export async function fetchMyBlooms() {
     .eq("author_id", user.id)
     .order("unlocks_at", { ascending: true });
   if (error) throw error;
-  return data as Bloom[];
+  return data as Vault[];
 }
 
-export async function createBloom(input: {
+export async function createVault(input: {
   media_url: string;
   media_kind: "image" | "video";
   caption?: string;
@@ -43,20 +43,20 @@ export async function createBloom(input: {
     .select()
     .single();
   if (error) throw error;
-  return data as Bloom;
+  return data as Vault;
 }
 
-export async function deleteBloom(id: string) {
+export async function deleteVault(id: string) {
   const { error } = await supabase.from("blooms").delete().eq("id", id);
   if (error) throw error;
 }
 
 /**
- * Unlocking (sealed -> live Petal) happens server-side on a schedule
+ * Unlocking (sealed -> live Flash) happens server-side on a schedule
  * (see supabase/functions/expire-content). This is exposed for a manual
  * "unlock now" debug action if you want one in the UI.
  */
-export async function unlockBloomNow(id: string) {
+export async function unlockVaultNow(id: string) {
   const { data, error } = await supabase.rpc("unlock_bloom", { bloom_id: id });
   if (error) throw error;
   return data;

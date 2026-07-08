@@ -1,19 +1,19 @@
-import type { Petal, Whisper } from "../types";
+import type { Flash, Blurt } from "../types";
 
-interface GardenGridProps {
-  petals: Petal[];
-  whispers: Whisper[];
-  onSelectPetal: (p: Petal) => void;
+interface SpaceGridProps {
+  flashes: Flash[];
+  blurts: Blurt[];
+  onSelectFlash: (p: Flash) => void;
 }
 
-/** Clean, grid-style layout of a Garden's Petals, with lingering Whispers shown as text tiles. */
-export default function GardenGrid({ petals, whispers, onSelectPetal }: GardenGridProps) {
-  const lingeringWhispers = whispers.filter((w) => w.lingering);
+/** Clean, grid-style layout of a Space's Flashes, with lingering Blurts shown as text tiles. */
+export default function SpaceGrid({ flashes, blurts, onSelectFlash }: SpaceGridProps) {
+  const lingeringBlurts = blurts.filter((w) => w.lingering);
 
-  if (petals.length === 0 && lingeringWhispers.length === 0) {
+  if (flashes.length === 0 && lingeringBlurts.length === 0) {
     return (
       <p style={{ color: "var(--ink-muted)", fontSize: 13.5, textAlign: "center", padding: "40px 0" }}>
-        This Garden is quiet for now — Petals fall after 24h, so only lingering Whispers stay.
+        This Space is quiet for now — Flashes fall after 24h, so only lingering Blurts stay.
       </p>
     );
   }
@@ -26,10 +26,10 @@ export default function GardenGrid({ petals, whispers, onSelectPetal }: GardenGr
         gap: 4,
       }}
     >
-      {petals.map((p) => (
+      {flashes.map((p) => (
         <button
           key={p.id}
-          onClick={() => onSelectPetal(p)}
+          onClick={() => onSelectFlash(p)}
           style={{
             aspectRatio: "1 / 1",
             border: "none",
@@ -53,7 +53,7 @@ export default function GardenGrid({ petals, whispers, onSelectPetal }: GardenGr
         </button>
       ))}
 
-      {lingeringWhispers.map((w) => (
+      {lingeringBlurts.map((w) => (
         <div
           key={w.id}
           style={{

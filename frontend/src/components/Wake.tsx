@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-const DEWDROPS = [
+const LINES = [
   "Slow mornings grow the deepest roots.",
   "Something small you plant today may bloom for someone else tomorrow.",
   "Not everything has to last to matter.",
-  "Your Garden missed you.",
+  "Your Space missed you.",
   "Even wilted petals fed the soil.",
   "Come back to yourself for a moment before the day starts.",
   "The path behind you is still there, quietly remembering.",
@@ -14,9 +14,9 @@ const DEWDROPS = [
  * A short, warm greeting shown once when the app opens. No action required —
  * it fades in, sits for a moment, then fades away on its own.
  */
-export default function MorningDew() {
+export default function Wake() {
   const [visible, setVisible] = useState(true);
-  const [line] = useState(() => DEWDROPS[Math.floor(Math.random() * DEWDROPS.length)]);
+  const [line] = useState(() => LINES[Math.floor(Math.random() * LINES.length)]);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(false), 4200);
@@ -45,7 +45,7 @@ export default function MorningDew() {
         display: "flex",
         alignItems: "center",
         gap: 10,
-        animation: "dewFade 4.2s ease forwards",
+        animation: "wakeFade 4.2s ease forwards",
         pointerEvents: "none",
         maxWidth: "min(90vw, 420px)",
         textAlign: "center",
@@ -54,7 +54,7 @@ export default function MorningDew() {
       <span aria-hidden="true">💧</span>
       <span>{line}</span>
       <style>{`
-        @keyframes dewFade {
+        @keyframes wakeFade {
           0% { opacity: 0; transform: translate(-50%, -6px); }
           10% { opacity: 1; transform: translate(-50%, 0); }
           80% { opacity: 1; }

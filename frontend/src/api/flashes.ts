@@ -1,8 +1,8 @@
 import { supabase } from "../lib/supabaseClient";
-import type { Petal } from "../types";
+import type { Flash } from "../types";
 
-/** Public feed: everyone's non-followers-only Petals that haven't fallen yet. */
-export async function fetchPetalFeed(limit = 30) {
+/** Public feed: everyone's non-followers-only Flashes that haven't fallen yet. */
+export async function fetchFlashFeed(limit = 30) {
   const { data, error } = await supabase
     .from("petals_with_counts")
     .select("*")
@@ -10,27 +10,27 @@ export async function fetchPetalFeed(limit = 30) {
     .order("posted_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return data as Petal[];
+  return data as Flash[];
 }
 
-/** All Petals (alive + fallen) belonging to one Garden, newest first — used by the Garden grid. */
-export async function fetchGardenPetals(authorId: string) {
+/** All Flashes (alive + fallen) belonging to one Space, newest first — used by the Space grid. */
+export async function fetchSpaceFlashes(authorId: string) {
   const { data, error } = await supabase
     .from("petals_with_counts")
     .select("*")
     .eq("author_id", authorId)
     .order("posted_at", { ascending: false });
   if (error) throw error;
-  return data as Petal[];
+  return data as Flash[];
 }
 
-export async function fetchPetal(id: string) {
+export async function fetchFlash(id: string) {
   const { data, error } = await supabase.from("petals_with_counts").select("*").eq("id", id).single();
   if (error) throw error;
-  return data as Petal;
+  return data as Flash;
 }
 
-export async function createPetal(input: {
+export async function createFlash(input: {
   media_url: string;
   media_kind: "image" | "video";
   caption?: string;
@@ -53,10 +53,10 @@ export async function createPetal(input: {
     .select()
     .single();
   if (error) throw error;
-  return data as Petal;
+  return data as Flash;
 }
 
-export async function deletePetal(id: string) {
+export async function deleteFlash(id: string) {
   const { error } = await supabase.from("petals").delete().eq("id", id);
   if (error) throw error;
 }

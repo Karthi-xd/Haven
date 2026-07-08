@@ -4,13 +4,13 @@ import PetalCanvas from "./components/PetalCanvas";
 import Landing from "./components/Landing";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Garden from "./components/Garden";
+import Space from "./components/Space";
 import LoadingScene from "./components/LoadingScene";
 import { usePetalTransition } from "./hooks/usePetalTransition";
 import { fetchMe } from "./api/auth";
 import { supabase, isSupabaseConfigured, withTimeout } from "./lib/supabaseClient";
 
-type View = "landing" | "login" | "register" | "garden";
+type View = "landing" | "login" | "register" | "space";
 
 export default function App() {
   const [view, setView] = useState<View>("landing");
@@ -53,9 +53,9 @@ export default function App() {
           return fetchMe()
             .then((profile) => {
               if (cancelled) return;
-              // Registration always creates the Garden profile in the same step,
-              // so a session always means "go straight to the Garden."
-              setView(profile ? "garden" : "landing");
+              // Registration always creates the Space profile in the same step,
+              // so a session always means "go straight to the Space."
+              setView(profile ? "space" : "landing");
             })
             .catch(() => {
               if (!cancelled) setView("landing");
@@ -127,17 +127,17 @@ export default function App() {
     requestAnimationFrame(() => setLoginPlay(true));
   }
 
-  // Registration lands the user straight in their Garden — no setup step in between.
+  // Registration lands the user straight in their Space — no setup step in between.
   function handleRegisterSuccess() {
     setRegisterActive(false);
     setRegisterPlay(false);
-    setView("garden");
+    setView("space");
   }
 
   function handleLoginSuccess() {
     setLoginActive(false);
     setLoginPlay(false);
-    setView("garden");
+    setView("space");
   }
 
   async function handleLogout() {
@@ -243,7 +243,7 @@ export default function App() {
         />
       )}
 
-      {view === "garden" && <Garden onLogout={handleLogout} />}
+      {view === "space" && <Space onLogout={handleLogout} />}
     </div>
   );
 }

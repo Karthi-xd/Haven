@@ -12,7 +12,7 @@ export interface Profile {
 }
 
 /** A photo/video post. Public by default, falls after 24h. */
-export interface Petal {
+export interface Flash {
   id: string;
   author: Profile;
   media_url: string;
@@ -22,13 +22,13 @@ export interface Petal {
   posted_at: string;
   expires_at: string;
   fallen: boolean; // true once past expires_at
-  touch_count: number;
-  rootbloom_count: number;
-  sprout_count: number;
+  buzz_count: number;
+  spark_count: number;
+  chime_count: number;
 }
 
 /** A short text post. Falls in 24h unless `lingering` is set. */
-export interface Whisper {
+export interface Blurt {
   id: string;
   author: Profile;
   body: string;
@@ -36,13 +36,13 @@ export interface Whisper {
   posted_at: string;
   expires_at: string | null; // null once lingering flips true
   fallen: boolean;
-  touch_count: number;
-  rootbloom_count: number;
-  sprout_count: number;
+  buzz_count: number;
+  spark_count: number;
+  chime_count: number;
 }
 
-/** A sealed, scheduled post. Hidden until unlocks_at, then behaves like a Petal. */
-export interface Bloom {
+/** A sealed, scheduled post. Hidden until unlocks_at, then behaves like a Flash. */
+export interface Vault {
   id: string;
   author: Profile;
   media_url: string;
@@ -51,14 +51,14 @@ export interface Bloom {
   followers_only: boolean;
   sealed: boolean; // true until unlocks_at passes
   unlocks_at: string;
-  unlocked_petal_id: string | null; // set once it opens into a live Petal
+  unlocked_flash_id: string | null; // set once it opens into a live Flash
   created_at: string;
 }
 
-export type ReactableKind = "petal" | "whisper";
+export type ReactableKind = "flash" | "blurt";
 
 /** Lightweight positive reaction (was "like/upvote"). */
-export interface Touch {
+export interface Buzz {
   id: string;
   user_id: string;
   target_kind: ReactableKind;
@@ -66,8 +66,8 @@ export interface Touch {
   created_at: string;
 }
 
-/** Lightweight negative reaction (was "dislike/downvote"). Petals wilt when this lands. */
-export interface Wilt {
+/** Lightweight negative reaction (was "dislike/downvote"). Flashes wilt when this lands. */
+export interface Strike {
   id: string;
   user_id: string;
   target_kind: ReactableKind;
@@ -75,8 +75,8 @@ export interface Wilt {
   created_at: string;
 }
 
-/** Rare reaction — "this genuinely changed how I see things". Visually distinct from a Touch. */
-export interface Rootbloom {
+/** Rare reaction — "this genuinely changed how I see things". Visually distinct from a Buzz. */
+export interface Spark {
   id: string;
   user_id: string;
   target_kind: ReactableKind;
@@ -84,8 +84,8 @@ export interface Rootbloom {
   created_at: string;
 }
 
-/** A reply/comment on a Petal or Whisper. */
-export interface Sprout {
+/** A reply/comment on a Flash or Blurt. */
+export interface Chime {
   id: string;
   target_kind: ReactableKind;
   target_id: string;
@@ -95,7 +95,7 @@ export interface Sprout {
   created_at: string;
 }
 
-/** Follow relationship — "Tending" someone's Garden. */
+/** Follow relationship — "Tending" someone's Space. */
 export interface Tending {
   id: string;
   tender_id: string; // the follower
@@ -103,8 +103,8 @@ export interface Tending {
   created_at: string;
 }
 
-/** A pending message request into someone's Garden Gate. */
-export interface Knock {
+/** A pending message request into someone's Den. */
+export interface Ping {
   id: string;
   from_id: string;
   to_id: string;
@@ -129,12 +129,12 @@ export interface Message {
   created_at: string;
 }
 
-/** A single branch point in a user's Petal Path / Bloomline. */
-export interface PetalPathNode {
-  petal_id: string;
+/** A single branch point in a user's Trail. */
+export interface TrailNode {
+  flash_id: string;
   media_url: string;
   posted_at: string;
   alive: boolean; // true = still pulsing, false = frozen in place
-  touch_count: number;
-  rootbloom_count: number;
+  buzz_count: number;
+  spark_count: number;
 }

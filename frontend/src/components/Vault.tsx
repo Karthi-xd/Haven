@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import type { Bloom as BloomType } from "../types";
-import { deleteBloom } from "../api/blooms";
+import type { Vault as VaultType } from "../types";
+import { deleteVault } from "../api/vaults";
 
-interface BloomProps {
-  bloom: BloomType;
+interface VaultProps {
+  vault: VaultType;
   onDeleted?: (id: string) => void;
 }
 
@@ -17,13 +17,13 @@ function untilUnlock(unlocksAt: string) {
   return `unlocks in ${hrs}h ${mins}m`;
 }
 
-/** A sealed Bloom — hidden from everyone until its unlock time, then it opens into a Petal. */
-export default function Bloom({ bloom, onDeleted }: BloomProps) {
-  const label = useMemo(() => untilUnlock(bloom.unlocks_at), [bloom.unlocks_at]);
+/** A sealed Vault — hidden from everyone until its unlock time, then it opens into a Flash. */
+export default function Vault({ vault, onDeleted }: VaultProps) {
+  const label = useMemo(() => untilUnlock(vault.unlocks_at), [vault.unlocks_at]);
 
   async function handleDelete() {
-    await deleteBloom(bloom.id);
-    onDeleted?.(bloom.id);
+    await deleteVault(vault.id);
+    onDeleted?.(vault.id);
   }
 
   return (
@@ -42,14 +42,14 @@ export default function Bloom({ bloom, onDeleted }: BloomProps) {
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 20 }} aria-hidden="true">🌑</span>
-        <strong style={{ color: "var(--cherry-deep)", fontSize: 14 }}>Sealed Bloom</strong>
+        <strong style={{ color: "var(--cherry-deep)", fontSize: 14 }}>Sealed Vault</strong>
       </div>
       <p style={{ margin: 0, fontSize: 13, color: "var(--ink-muted)" }}>
-        {bloom.caption || "No caption yet."} — only you can see this until it opens.
+        {vault.caption || "No caption yet."} — only you can see this until it opens.
       </p>
       <div style={{ fontSize: 12.5, color: "var(--cherry)", fontWeight: 700 }}>{label}</div>
       <div style={{ fontSize: 11.5, color: "var(--ink-muted)" }}>
-        {bloom.followers_only ? "Will unlock as followers-only" : "Will unlock publicly, like any Petal"}
+        {vault.followers_only ? "Will unlock as followers-only" : "Will unlock publicly, like any Flash"}
       </div>
       <button
         type="button"
