@@ -14,8 +14,8 @@ import Trail from "./Trail";
 import Den from "./Den";
 import Composer from "./Composer";
 import FlashCard from "./Flash";
-import BlurtCard from "./Blurt";
 import VaultCard from "./Vault";
+import Feed from "./Feed";
 
 interface SpaceProps {
   onLogout: () => void;
@@ -194,18 +194,18 @@ export default function Space({ onLogout }: SpaceProps) {
             </div>
 
             <Composer
-              onFlashCreated={(p) => setMyFlashes((prev) => [p, ...prev])}
+              onFlashCreated={(p) => { setMyFlashes((prev) => [p, ...prev]); setFeedFlashes((prev) => [p, ...prev]); }}
               onBlurtCreated={(w) => { setMyBlurts((prev) => [w, ...prev]); setFeedBlurts((prev) => [w, ...prev]); }}
               onVaultCreated={refreshMine}
             />
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 640 }}>
-              {feedBlurts.map((w) => <BlurtCard key={w.id} blurt={w} isOwn={w.author.id === profile?.id} />)}
-              {feedFlashes.map((p) => <FlashCard key={p.id} flash={p} />)}
-              {feedFlashes.length === 0 && feedBlurts.length === 0 && (
-                <p style={{ color: "var(--ink-muted)", fontSize: 13.5 }}>Nothing's alive right now — be the first to plant something today.</p>
-              )}
-            </div>
+            <Feed
+              flashes={feedFlashes}
+              blurts={feedBlurts}
+              currentUserId={profile?.id}
+              onFlashFallen={(id) => setFeedFlashes((prev) => prev.filter((f) => f.id !== id))}
+              onBlurtFallen={(id) => setFeedBlurts((prev) => prev.filter((w) => w.lingering || w.id !== id))}
+            />
           </>
         )}
 

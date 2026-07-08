@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent, type FormEvent } from "react";
 import { createFlash } from "../api/flashes";
 import { createBlurt } from "../api/blurts";
 import { createVault } from "../api/vaults";
@@ -13,7 +13,13 @@ interface ComposerProps {
   onVaultCreated?: () => void;
 }
 
+const BLURT_LIMIT = 280;
+const MAX_MEDIA_BYTES = 100 * 1024 * 1024; // 100MB
+
 const tabStyle = (active: boolean): React.CSSProperties => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
   border: "none",
   background: active ? "var(--cherry)" : "transparent",
   color: active ? "#fff" : "var(--ink-muted)",
@@ -22,11 +28,19 @@ const tabStyle = (active: boolean): React.CSSProperties => ({
   padding: "8px 16px",
   borderRadius: 999,
   cursor: "pointer",
+  transition: "background 0.2s ease, color 0.2s ease",
 });
+
+const MODE_META: Record<Mode, { icon: string; label: string; hint: string; cta: string }> = {
+  blurt: { icon: "✍️", label: "Blurt", hint: "Say something quick — it falls in 24h unless you let it linger.", cta: "Blurt it" },
+  flash: { icon: "📸", label: "Flash", hint: "A photo or video, visible to everyone, gone in 24h.", cta: "Let it fall" },
+  vault: { icon: "🌑", label: "Vault", hint: "Seal a photo or video away until a future date, then it opens like any Flash.", cta: "Seal the Vault" },
+};
 
 export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreated }: ComposerProps) {
   const [mode, setMode] = useState<Mode>("blurt");
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
   const [blurtBody, setBlurtBody] = useState("");
   const [unlocksAt, setUnlocksAt] = useState("");
@@ -34,6 +48,57 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
   const [followersOnly, setFollowersOnly] = useState(false); // deliberately buried
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const remaining = BLURT_LIMIT - blurtBody.length;
+  const meta = MODE_META[mode];
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const minUnlockLocal = useMemo(() => {
+    const d = new Date(Date.now() + 5 * 60 * 1000); // at least 5 minutes out
+    d.setSeconds(0, 0);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }, []);
+
+  function pickFile(f: File | null) {
+    setError("");
+    if (!f) {
+      setFile(null);
+      return;
+    }
+    if (!f.type.startsWith("image/") && !f.type.startsWith("video/")) {
+      setError("Please choose a photo or video file.");
+      return;
+    }
+    if (f.size > MAX_MEDIA_BYTES) {
+      setError("That file is too big — keep it under 100MB.");
+      return;
+    }
+    setFile(f);
+  }
+
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(false);
+    pickFile(e.dataTransfer.files?.[0] ?? null);
+  }
+
+  function resetMediaFields() {
+    setFile(null);
+    setCaption("");
+    setUnlocksAt("");
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -51,12 +116,12 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
         const media_url = await uploadFlashMedia(file);
         const media_kind = file.type.startsWith("video") ? "video" : "image";
         const p = await createFlash({ media_url, media_kind, caption, followers_only: followersOnly });
-        setFile(null);
-        setCaption("");
+        resetMediaFields();
         onFlashCreated?.(p);
       } else {
         if (!file) throw new Error("Choose a photo or video first.");
         if (!unlocksAt) throw new Error("Pick a date and time for it to unlock.");
+        if (new Date(unlocksAt).getTime() <= Date.now()) throw new Error("Pick a time in the future.");
         const media_url = await uploadFlashMedia(file);
         const media_kind = file.type.startsWith("video") ? "video" : "image";
         await createVault({
@@ -66,9 +131,7 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
           followers_only: followersOnly,
           unlocks_at: new Date(unlocksAt).toISOString(),
         });
-        setFile(null);
-        setCaption("");
-        setUnlocksAt("");
+        resetMediaFields();
         onVaultCreated?.();
       }
     } catch (err: any) {
@@ -91,30 +154,81 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
       }}
     >
       <div style={{ display: "flex", gap: 8 }}>
-        <button type="button" style={tabStyle(mode === "blurt")} onClick={() => setMode("blurt")}>Blurt</button>
-        <button type="button" style={tabStyle(mode === "flash")} onClick={() => setMode("flash")}>Flash</button>
-        <button type="button" style={tabStyle(mode === "vault")} onClick={() => setMode("vault")}>Vault</button>
+        {(["blurt", "flash", "vault"] as Mode[]).map((m) => (
+          <button key={m} type="button" style={tabStyle(mode === m)} onClick={() => { setMode(m); setError(""); }}>
+            <span aria-hidden="true">{MODE_META[m].icon}</span> {MODE_META[m].label}
+          </button>
+        ))}
       </div>
+
+      <p style={{ margin: 0, fontSize: 12, color: "var(--ink-muted)" }}>{meta.hint}</p>
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {mode === "blurt" && (
-          <textarea
-            value={blurtBody}
-            onChange={(e) => setBlurtBody(e.target.value)}
-            maxLength={280}
-            placeholder="Blurt something... it falls in 24h unless you let it linger."
-            rows={3}
-            style={{ border: "1px solid var(--line)", borderRadius: 14, padding: 12, fontSize: 14, resize: "vertical" }}
-          />
+          <div>
+            <textarea
+              value={blurtBody}
+              onChange={(e) => setBlurtBody(e.target.value.slice(0, BLURT_LIMIT))}
+              maxLength={BLURT_LIMIT}
+              placeholder="Blurt something…"
+              rows={3}
+              style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: 12, fontSize: 14, resize: "vertical", fontFamily: "inherit" }}
+            />
+            <div style={{ textAlign: "right", fontSize: 11, color: remaining < 20 ? "var(--cherry)" : "var(--ink-muted)", marginTop: 4 }}>
+              {remaining} left
+            </div>
+          </div>
         )}
 
         {(mode === "flash" || mode === "vault") && (
           <>
-            <input
-              type="file"
-              accept="image/*,video/*"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                border: `1.5px dashed ${dragActive ? "var(--cherry)" : "var(--line)"}`,
+                borderRadius: 16,
+                padding: previewUrl ? 10 : 24,
+                textAlign: "center",
+                cursor: "pointer",
+                background: dragActive ? "var(--blush-soft)" : "transparent",
+                transition: "border-color 0.2s ease, background 0.2s ease",
+              }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+                style={{ display: "none" }}
+              />
+              {previewUrl ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {file?.type.startsWith("video") ? (
+                    <video src={previewUrl} style={{ width: 88, height: 88, objectFit: "cover", borderRadius: 10 }} muted />
+                  ) : (
+                    <img src={previewUrl} alt="preview" style={{ width: 88, height: 88, objectFit: "cover", borderRadius: 10 }} />
+                  )}
+                  <div style={{ textAlign: "left", flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{file?.name}</div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); pickFile(null); }}
+                      style={{ border: "none", background: "transparent", color: "var(--cherry)", fontSize: 12, textDecoration: "underline", cursor: "pointer", padding: 0, marginTop: 4 }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <span style={{ fontSize: 13, color: "var(--ink-muted)" }}>
+                  📎 Drop a photo or video here, or click to choose one
+                </span>
+              )}
+            </div>
+
             <input
               type="text"
               value={caption}
@@ -131,6 +245,7 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
             <input
               type="datetime-local"
               value={unlocksAt}
+              min={minUnlockLocal}
               onChange={(e) => setUnlocksAt(e.target.value)}
               style={{ border: "1px solid var(--line)", borderRadius: 10, padding: "8px 12px", fontSize: 14 }}
             />
@@ -173,7 +288,7 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
             opacity: submitting ? 0.7 : 1,
           }}
         >
-          {submitting ? "Planting…" : mode === "blurt" ? "Blurt it" : mode === "flash" ? "Let it fall" : "Seal the Vault"}
+          {submitting ? "Planting…" : meta.cta}
         </button>
       </form>
     </div>
