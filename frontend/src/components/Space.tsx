@@ -73,21 +73,49 @@ export default function Space({ onLogout }: SpaceProps) {
   const username = profile?.username || "explorer";
   const avatar = profile?.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=haven";
 
+  const NAV_ICONS: Record<Tab, JSX.Element> = {
+    feed: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 10.5 12 3l9 7.5" />
+        <path d="M5.5 9.5V20a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V9.5" />
+      </svg>
+    ),
+    space: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+        <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+        <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+      </svg>
+    ),
+    trail: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="6" cy="6" r="2.2" />
+        <circle cx="18" cy="12" r="2.2" />
+        <circle cx="8" cy="19" r="2.2" />
+        <path d="M7.6 7.6 15.8 11M16 14l-6 3.6" />
+      </svg>
+    ),
+    den: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5Z" />
+      </svg>
+    ),
+    settings: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3.2" />
+        <path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2.06 2.06 0 1 1-2.92 2.92l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V19.7a2.06 2.06 0 1 1-4.12 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2.06 2.06 0 1 1-2.92-2.92l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H4.3a2.06 2.06 0 1 1 0-4.12h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2.06 2.06 0 1 1 2.92-2.92l.06.06a1.7 1.7 0 0 0 1.87.34H10.5a1.7 1.7 0 0 0 1.03-1.56V4.3a2.06 2.06 0 1 1 4.12 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2.06 2.06 0 1 1 2.92 2.92l-.06.06a1.7 1.7 0 0 0-.34 1.87V10.5a1.7 1.7 0 0 0 1.56 1.03h.09a2.06 2.06 0 1 1 0 4.12h-.09a1.7 1.7 0 0 0-1.56 1.03Z" />
+      </svg>
+    ),
+  };
+
   const navItem = (key: Tab, label: string) => (
     <button
+      type="button"
       onClick={() => setTab(key)}
-      style={{
-        textAlign: "left",
-        border: "none",
-        background: tab === key ? "rgba(196,24,60,0.08)" : "transparent",
-        color: tab === key ? "var(--cherry-deep)" : "var(--ink-muted)",
-        fontWeight: tab === key ? 700 : 500,
-        fontSize: 14,
-        padding: "10px 14px",
-        borderRadius: 12,
-        cursor: "pointer",
-      }}
+      className={`space-nav-item${tab === key ? " active" : ""}`}
     >
+      <span className="nav-icon" aria-hidden="true">{NAV_ICONS[key]}</span>
       {label}
     </button>
   );
@@ -127,19 +155,16 @@ export default function Space({ onLogout }: SpaceProps) {
             type="button"
             onClick={() => setTab("settings")}
             title="Edit your profile"
+            className="space-card interactive"
             style={{
-              background: "#fff",
-              borderRadius: 18,
-              border: tab === "settings" ? "1px solid var(--cherry)" : "1px solid var(--line)",
+              borderColor: tab === "settings" ? "var(--cherry)" : undefined,
               padding: "20px 16px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               textAlign: "center",
-              boxShadow: "0 4px 16px rgba(196,24,60,0.04)",
               cursor: "pointer",
               position: "relative",
-              transition: "border-color 0.2s ease, transform 0.15s ease",
             }}
           >
             <span
@@ -181,8 +206,8 @@ export default function Space({ onLogout }: SpaceProps) {
             </div>
           </button>
 
-          <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {navItem("feed", "Everyone's Flashes & Blurts")}
+          <nav className="space-nav">
+            {navItem("feed", "Feed")}
             {navItem("space", "My Space")}
             {navItem("trail", "Trail")}
             {navItem("den", "Den")}
@@ -190,20 +215,11 @@ export default function Space({ onLogout }: SpaceProps) {
           </nav>
         </div>
 
-        <button
-          onClick={onLogout}
-          style={{
-            width: "100%",
-            padding: 12,
-            borderRadius: 999,
-            border: "1.5px solid var(--line)",
-            background: "transparent",
-            color: "var(--ink-muted)",
-            fontFamily: "Shippori Mincho, serif",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+        <button type="button" onClick={onLogout} className="btn btn-ghost" style={{ width: "100%" }}>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h9" />
+            <path d="M19 12H9m10 0-3.5-3.5M19 12l-3.5 3.5" />
+          </svg>
           Logout
         </button>
       </aside>
@@ -211,13 +227,13 @@ export default function Space({ onLogout }: SpaceProps) {
       {/* MAIN CONTENT */}
       <main style={{ padding: "40px 60px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 24 }}>
         {tab === "feed" && (
-          <>
+          <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
               <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 32, margin: "0 0 6px", color: "var(--ink)" }}>
-                Welcome back, {displayName}!
+                Welcome back, {displayName}
               </h1>
               <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
-                Here's what's blooming across Haven right now.
+                Here's what's new across Haven right now.
               </p>
             </div>
 
@@ -234,11 +250,11 @@ export default function Space({ onLogout }: SpaceProps) {
               onFlashFallen={(id) => setFeedFlashes((prev) => prev.filter((f) => f.id !== id))}
               onBlurtFallen={(id) => setFeedBlurts((prev) => prev.filter((w) => w.lingering || w.id !== id))}
             />
-          </>
+          </div>
         )}
 
         {tab === "space" && (
-          <>
+          <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
             <SpaceGrid flashes={myFlashes} blurts={myBlurts} onSelectFlash={setSelectedFlash} />
             {myVaults.length > 0 && (
@@ -254,31 +270,33 @@ export default function Space({ onLogout }: SpaceProps) {
                 <FlashCard flash={selectedFlash} />
               </div>
             )}
-          </>
+          </div>
         )}
 
         {tab === "trail" && profile && (
-          <>
+          <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Trail</h1>
             <Trail authorId={profile.id} />
-          </>
+          </div>
         )}
 
         {tab === "den" && profile && (
-          <>
+          <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24, height: "100%" }}>
             <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Den</h1>
             <Den myId={profile.id} />
-          </>
+          </div>
         )}
 
         {tab === "settings" && profile && (
-          <ProfileSettings
-            profile={{ ...profile, karma: counts.tenders }}
-            onBack={() => setTab("feed")}
-            onUpdated={(updated) =>
-              setProfile((prev) => (prev ? ({ ...prev, ...updated } as Profile) : prev))
-            }
-          />
+          <div className="haven-panel-in">
+            <ProfileSettings
+              profile={{ ...profile, karma: counts.tenders }}
+              onBack={() => setTab("feed")}
+              onUpdated={(updated) =>
+                setProfile((prev) => (prev ? ({ ...prev, ...updated } as Profile) : prev))
+              }
+            />
+          </div>
         )}
       </main>
     </div>

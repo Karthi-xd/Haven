@@ -4,7 +4,7 @@ import type { TrailNode } from "../types";
 /** The branching map of where a Space's Flashes traveled and settled. */
 export async function fetchTrail(authorId: string): Promise<TrailNode[]> {
   const { data, error } = await supabase
-    .from("petals_with_counts")
+    .from("flashes_with_counts")
     .select("id, media_url, posted_at, fallen, touch_count, rootbloom_count")
     .eq("author_id", authorId)
     .order("posted_at", { ascending: true });

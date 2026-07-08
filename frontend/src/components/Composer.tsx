@@ -16,25 +16,32 @@ interface ComposerProps {
 const BLURT_LIMIT = 280;
 const MAX_MEDIA_BYTES = 100 * 1024 * 1024; // 100MB
 
-const tabStyle = (active: boolean): React.CSSProperties => ({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  border: "none",
-  background: active ? "var(--cherry)" : "transparent",
-  color: active ? "#fff" : "var(--ink-muted)",
-  fontWeight: 700,
-  fontSize: 13,
-  padding: "8px 16px",
-  borderRadius: 999,
-  cursor: "pointer",
-  transition: "background 0.2s ease, color 0.2s ease",
-});
+const MODE_ICONS: Record<Mode, JSX.Element> = {
+  blurt: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5 5.2 15 16 4.2a2 2 0 0 1 2.8 0l1 1a2 2 0 0 1 0 2.8L8.9 18.8Z" />
+      <path d="m14 6.2 3.8 3.8" />
+    </svg>
+  ),
+  flash: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 8a2 2 0 0 1 2-2h1.2l1-1.6A1 1 0 0 1 9 4h6a1 1 0 0 1 .86.5L17 6h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" />
+      <circle cx="12" cy="12.5" r="3.4" />
+    </svg>
+  ),
+  vault: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="10.5" width="16" height="9.5" rx="2" />
+      <path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5" />
+      <circle cx="12" cy="15" r="1.4" />
+    </svg>
+  ),
+};
 
-const MODE_META: Record<Mode, { icon: string; label: string; hint: string; cta: string }> = {
-  blurt: { icon: "✍️", label: "Blurt", hint: "Say something quick — it falls in 24h unless you let it linger.", cta: "Blurt it" },
-  flash: { icon: "📸", label: "Flash", hint: "A photo or video, visible to everyone, gone in 24h.", cta: "Let it fall" },
-  vault: { icon: "🌑", label: "Vault", hint: "Seal a photo or video away until a future date, then it opens like any Flash.", cta: "Seal the Vault" },
+const MODE_META: Record<Mode, { label: string; hint: string; cta: string; sendingLabel: string }> = {
+  blurt: { label: "Blurt", hint: "Say something quick — it falls in 24h unless you let it linger.", cta: "Blurt it", sendingLabel: "Sending…" },
+  flash: { label: "Flash", hint: "A photo or video, visible to everyone, gone in 24h.", cta: "Let it fall", sendingLabel: "Uploading…" },
+  vault: { label: "Vault", hint: "Seal a photo or video away until a future date, then it opens like any Flash.", cta: "Seal the Vault", sendingLabel: "Sealing…" },
 };
 
 export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreated }: ComposerProps) {
@@ -143,10 +150,8 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
 
   return (
     <div
+      className="space-card"
       style={{
-        background: "#fff",
-        border: "1px solid var(--line)",
-        borderRadius: 20,
         padding: 20,
         display: "flex",
         flexDirection: "column",
@@ -155,8 +160,13 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
     >
       <div style={{ display: "flex", gap: 8 }}>
         {(["blurt", "flash", "vault"] as Mode[]).map((m) => (
-          <button key={m} type="button" style={tabStyle(mode === m)} onClick={() => { setMode(m); setError(""); }}>
-            <span aria-hidden="true">{MODE_META[m].icon}</span> {MODE_META[m].label}
+          <button
+            key={m}
+            type="button"
+            className={`composer-tab${mode === m ? " active" : ""}`}
+            onClick={() => { setMode(m); setError(""); }}
+          >
+            <span aria-hidden="true">{MODE_ICONS[m]}</span> {MODE_META[m].label}
           </button>
         ))}
       </div>
@@ -223,8 +233,12 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
                   </div>
                 </div>
               ) : (
-                <span style={{ fontSize: 13, color: "var(--ink-muted)" }}>
-                  📎 Drop a photo or video here, or click to choose one
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-muted)" }}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 4v10.5M8 8l4-4 4 4" />
+                    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+                  </svg>
+                  Drop a photo or video here, or click to choose one
                 </span>
               )}
             </div>
@@ -272,23 +286,8 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
 
         {error && <p style={{ color: "var(--cherry-deep)", fontSize: 12.5, margin: 0 }}>{error}</p>}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          style={{
-            alignSelf: "flex-start",
-            border: "none",
-            background: "var(--cherry)",
-            color: "#fff",
-            fontWeight: 700,
-            fontSize: 13.5,
-            padding: "10px 22px",
-            borderRadius: 999,
-            cursor: "pointer",
-            opacity: submitting ? 0.7 : 1,
-          }}
-        >
-          {submitting ? "Planting…" : meta.cta}
+        <button type="submit" disabled={submitting} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
+          {submitting ? meta.sendingLabel : meta.cta}
         </button>
       </form>
     </div>

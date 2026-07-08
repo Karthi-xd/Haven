@@ -4,7 +4,7 @@ import type { Flash } from "../types";
 /** Public feed: everyone's non-followers-only Flashes that haven't fallen yet. */
 export async function fetchFlashFeed(limit = 30) {
   const { data, error } = await supabase
-    .from("petals_with_counts")
+    .from("flashes_with_counts")
     .select("*")
     .eq("fallen", false)
     .order("posted_at", { ascending: false })
@@ -16,7 +16,7 @@ export async function fetchFlashFeed(limit = 30) {
 /** All Flashes (alive + fallen) belonging to one Space, newest first — used by the Space grid. */
 export async function fetchSpaceFlashes(authorId: string) {
   const { data, error } = await supabase
-    .from("petals_with_counts")
+    .from("flashes_with_counts")
     .select("*")
     .eq("author_id", authorId)
     .order("posted_at", { ascending: false });
@@ -25,7 +25,7 @@ export async function fetchSpaceFlashes(authorId: string) {
 }
 
 export async function fetchFlash(id: string) {
-  const { data, error } = await supabase.from("petals_with_counts").select("*").eq("id", id).single();
+  const { data, error } = await supabase.from("flashes_with_counts").select("*").eq("id", id).single();
   if (error) throw error;
   return data as Flash;
 }
@@ -42,7 +42,7 @@ export async function createFlash(input: {
   if (!user) throw new Error("Not signed in.");
 
   const { data, error } = await supabase
-    .from("petals")
+    .from("flashes")
     .insert({
       author_id: user.id,
       media_url: input.media_url,
@@ -57,6 +57,6 @@ export async function createFlash(input: {
 }
 
 export async function deleteFlash(id: string) {
-  const { error } = await supabase.from("petals").delete().eq("id", id);
+  const { error } = await supabase.from("flashes").delete().eq("id", id);
   if (error) throw error;
 }

@@ -1,8 +1,8 @@
 import { supabase } from "../lib/supabaseClient";
 
-const BUCKET = "petal-media";
+const BUCKET = "flash-media";
 
-/** Uploads a photo/video to the `petal-media` bucket and returns its public URL. */
+/** Uploads a photo/video to the `flash-media` bucket and returns its public URL. */
 export async function uploadFlashMedia(file: File) {
   const {
     data: { user },
@@ -22,7 +22,7 @@ export async function uploadFlashMedia(file: File) {
   return data.publicUrl;
 }
 
-/** Uploads a new profile picture to the `petal-media` bucket and returns its public URL. */
+/** Uploads a new profile picture to the `flash-media` bucket and returns its public URL. */
 export async function uploadAvatarImage(file: File) {
   const {
     data: { user },
