@@ -25,6 +25,27 @@ type ConvoRow = {
 const EMOJI = ["🌸", "😀", "😂", "❤️", "👍", "🎉", "🔥", "🥲", "😢", "🙏", "✨", "😴"];
 const READ_KEY_PREFIX = "haven-den-read:";
 
+type Ripple = { id: number; x: number; y: number };
+
+/** Same click-point ripple used on the landing CTA and the composer — kept the send button in the same family. */
+function useRipple() {
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  function trigger(e: React.MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const id = Date.now() + Math.random();
+    setRipples((prev) => [...prev, { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
+    setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== id)), 700);
+  }
+  const layer = (
+    <span className="cta-ripple-layer" aria-hidden="true">
+      {ripples.map((r) => (
+        <span key={r.id} className="cta-ripple" style={{ left: r.x, top: r.y }} />
+      ))}
+    </span>
+  );
+  return { trigger, layer };
+}
+
 function readKey(myId: string, conversationId: string) {
   return `${READ_KEY_PREFIX}${myId}:${conversationId}`;
 }
@@ -82,6 +103,7 @@ export default function Den({ myId }: { myId: string }) {
   const [showEmoji, setShowEmoji] = useState(false);
   const [sending, setSending] = useState(false);
   const [readTick, setReadTick] = useState(0);
+  const sendRipple = useRipple();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -377,11 +399,23 @@ export default function Den({ myId }: { myId: string }) {
                     <div className="den-date-divider">
                       <span>{group.label}</span>
                     </div>
-                    {group.items.map((m) => {
+                    {group.items.map((m, idx) => {
                       const mine = m.sender_id === myId;
+                      const next = group.items[idx + 1];
+                      const isLastOfRun = !next || next.sender_id !== m.sender_id;
                       return (
-                        <div key={m.id} className={`den-msg-row${mine ? " mine" : ""}`}>
-                          <div className={`den-bubble${mine ? " mine" : ""}`}>
+                        <div key={m.id} className={`den-msg-row${mine ? " mine" : ""}${isLastOfRun ? " is-tail" : ""}`}>
+                          {!mine && (
+                            <span className={`den-msg-avatar${isLastOfRun ? "" : " is-spacer"}`} aria-hidden="true">
+                              {isLastOfRun &&
+                                (activeOther?.avatar_url ? (
+                                  <img src={activeOther.avatar_url} alt="" />
+                                ) : (
+                                  <span className="den-convo-avatar-fallback">🌸</span>
+                                ))}
+                            </span>
+                          )}
+                          <div className={`den-bubble${mine ? " mine" : ""}${isLastOfRun ? " is-tail" : ""}`}>
                             {m.body}
                             <span className="den-bubble-time">{formatClock(m.created_at)}</span>
                           </div>
@@ -393,6 +427,13 @@ export default function Den({ myId }: { myId: string }) {
               )}
               {typingFrom && (
                 <div className="den-msg-row">
+                  <span className="den-msg-avatar" aria-hidden="true">
+                    {activeOther?.avatar_url ? (
+                      <img src={activeOther.avatar_url} alt="" />
+                    ) : (
+                      <span className="den-convo-avatar-fallback">🌸</span>
+                    )}
+                  </span>
                   <div className="den-bubble den-typing-bubble">
                     <span className="den-typing-dot" />
                     <span className="den-typing-dot" />
@@ -430,10 +471,16 @@ export default function Den({ myId }: { myId: string }) {
                 rows={1}
                 className="den-composer-input"
               />
-              <button type="submit" className="den-send-btn" disabled={!draft.trim() || sending}>
+              <button
+                type="submit"
+                className="den-send-btn"
+                disabled={!draft.trim() || sending}
+                onClick={(e) => sendRipple.trigger(e)}
+              >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                   <path d="M3 11.5 20.5 3l-6 17.5-4-7.5-7.5-1.5Z" />
                 </svg>
+                {sendRipple.layer}
               </button>
             </form>
           </>

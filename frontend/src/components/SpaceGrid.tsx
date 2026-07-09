@@ -6,70 +6,56 @@ interface SpaceGridProps {
   onSelectFlash: (p: Flash) => void;
 }
 
-/** Clean, grid-style layout of a Space's Flashes, with lingering Blurts shown as text tiles. */
+const ViewIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+/** Clean, grid-style layout of a Space's Flashes, with lingering Blurts shown as petal tiles. */
 export default function SpaceGrid({ flashes, blurts, onSelectFlash }: SpaceGridProps) {
   const lingeringBlurts = blurts.filter((w) => w.lingering);
 
   if (flashes.length === 0 && lingeringBlurts.length === 0) {
     return (
-      <p style={{ color: "var(--ink-muted)", fontSize: 13.5, textAlign: "center", padding: "40px 0" }}>
+      <div className="space-grid-empty">
+        <span aria-hidden="true">🌸</span>
         This Space is quiet for now — Flashes fall after 24h, so only lingering Blurts stay.
-      </p>
+      </div>
     );
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap: 4,
-      }}
-    >
-      {flashes.map((p) => (
+    <div className="space-grid">
+      {flashes.map((p, i) => (
         <button
           key={p.id}
           onClick={() => onSelectFlash(p)}
-          style={{
-            aspectRatio: "1 / 1",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
-            overflow: "hidden",
-            position: "relative",
-            opacity: p.fallen ? 0.45 : 1,
-          }}
+          className={`space-tile${p.fallen ? " is-fallen" : ""}`}
+          style={{ ["--i" as any]: i }}
+          title={p.caption || "View Flash"}
         >
           {p.media_kind === "video" ? (
-            <video src={p.media_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted />
+            <video src={p.media_url} className="space-tile-media" muted />
           ) : (
-            <img src={p.media_url} alt={p.caption} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={p.media_url} alt={p.caption} className="space-tile-media" />
           )}
-          {p.fallen && (
-            <span style={{ position: "absolute", top: 6, right: 6, fontSize: 11, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "2px 6px", borderRadius: 999 }}>
-              fallen
-            </span>
-          )}
+          <span className="space-tile-overlay" aria-hidden="true">
+            <ViewIcon />
+          </span>
+          {p.fallen && <span className="space-tile-badge">fallen</span>}
         </button>
       ))}
 
-      {lingeringBlurts.map((w) => (
+      {lingeringBlurts.map((w, i) => (
         <div
           key={w.id}
-          style={{
-            aspectRatio: "1 / 1",
-            background: "linear-gradient(160deg, #fff4f6, #ffe9ec)",
-            border: "1px solid var(--line)",
-            padding: 12,
-            fontSize: 12.5,
-            color: "var(--ink)",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "center",
-            textAlign: "center",
-          }}
+          className="space-tile space-tile-blurt"
+          style={{ ["--i" as any]: flashes.length + i }}
         >
-          {w.body}
+          <span className="space-tile-blurt-icon" aria-hidden="true">🌿</span>
+          <p className="space-tile-blurt-text">{w.body}</p>
         </div>
       ))}
     </div>

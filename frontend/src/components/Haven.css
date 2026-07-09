@@ -1586,10 +1586,11 @@ input:focus-visible {
   flex-direction: column;
   gap: 12px;
   min-height: 0;
-  background: var(--white-soft);
+  background: linear-gradient(165deg, #fffdfc 0%, var(--white-soft) 100%);
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 16px;
+  box-shadow: 0 4px 18px rgba(196, 24, 60, 0.04);
 }
 
 .den-section-title {
@@ -1605,6 +1606,43 @@ input:focus-visible {
 
 .den-pings { flex-shrink: 0; }
 .den-pings-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ping-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: linear-gradient(160deg, #fff, #fff8f9);
+  box-shadow: 0 4px 14px rgba(196, 24, 60, 0.06);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), border-color 0.3s ease;
+}
+.ping-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(196, 24, 60, 0.12);
+  border-color: rgba(196, 24, 60, 0.28);
+}
+.ping-avatar { width: 40px; height: 40px; }
+.ping-avatar .den-convo-avatar-fallback { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.ping-info { flex: 1; min-width: 0; }
+.ping-name {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.ping-message {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ping-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.ping-actions .feed-btn { white-space: nowrap; }
 
 .den-search-wrap {
   position: relative;
@@ -1628,9 +1666,9 @@ input:focus-visible {
   font-size: 13px;
   color: var(--ink);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
-.den-search-input:focus { border-color: var(--cherry); }
+.den-search-input:focus { border-color: var(--cherry); box-shadow: 0 0 0 3px rgba(196, 24, 60, 0.1); }
 .den-search-input::placeholder { color: var(--ink-muted); }
 
 .den-convo-scroll {
@@ -1662,10 +1700,24 @@ input:focus-visible {
   border-radius: 14px;
   padding: 9px 10px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.2s var(--ease-out), transform 0.2s var(--ease-out);
 }
-.den-convo-item:hover { background: rgba(196,24,60,0.05); }
+.den-convo-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--cherry-bright), var(--cherry));
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition: opacity 0.2s ease, transform 0.25s var(--ease-out);
+}
+.den-convo-item:hover { background: rgba(196,24,60,0.05); transform: translateX(1px); }
 .den-convo-item.active { background: rgba(196,24,60,0.09); }
+.den-convo-item.active::before { opacity: 1; transform: scaleY(1); }
 .den-convo-item.unread .den-convo-name { color: var(--cherry-deep); }
 .den-convo-item.unread .den-convo-preview { color: var(--ink); font-weight: 600; }
 
@@ -1680,7 +1732,9 @@ input:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.3s var(--ease-out);
 }
+.den-convo-item:hover .den-convo-avatar { transform: scale(1.06); }
 .den-convo-avatar img {
   width: 100%;
   height: 100%;
@@ -1698,6 +1752,13 @@ input:focus-visible {
   border-radius: 50%;
   background: #33C46B;
   border: 2px solid var(--white-soft);
+  box-shadow: 0 0 0 0 rgba(51, 196, 107, 0.5);
+  animation: den-online-pulse 2.2s ease-out infinite;
+}
+@keyframes den-online-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(51, 196, 107, 0.45); }
+  70%  { box-shadow: 0 0 0 5px rgba(51, 196, 107, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(51, 196, 107, 0); }
 }
 
 .den-convo-meta {
@@ -1755,7 +1816,7 @@ input:focus-visible {
   border: 1px solid var(--line);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(196, 24, 60, 0.05);
+  box-shadow: 0 10px 30px rgba(196, 24, 60, 0.06);
 }
 
 .den-chat-empty {
@@ -1764,11 +1825,15 @@ input:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   text-align: center;
   padding: 30px;
+  margin: 20px;
   color: var(--ink-muted);
   font-family: 'Zen Kaku Gothic New', sans-serif;
+  border: 1.5px dashed var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.5);
 }
 .den-chat-empty h3 {
   margin: 4px 0 0;
@@ -1778,33 +1843,51 @@ input:focus-visible {
   font-size: 18px;
 }
 .den-chat-empty p { margin: 0; font-size: 13px; }
-.den-chat-empty-art { font-size: 34px; }
-.den-chat-empty.small { padding: 16px; gap: 4px; }
+.den-chat-empty-art {
+  font-size: 34px;
+  display: inline-block;
+  animation: den-float 3.2s ease-in-out infinite;
+}
+@keyframes den-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.den-chat-empty.small { padding: 16px; gap: 4px; margin: 0; border: none; background: transparent; }
 .den-chat-empty.small .den-chat-empty-art { font-size: 24px; }
 .den-chat-empty.small p { font-size: 12.5px; }
 
 .den-chat-header {
+  position: relative;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--line);
-  background: var(--white-soft);
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.den-chat-header::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(196, 24, 60, 0.22), transparent 70%);
 }
 .den-chat-header-avatar {
   position: relative;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  padding: 2px;
   overflow: visible;
-  background: var(--blush);
+  background: linear-gradient(135deg, var(--cherry-bright), var(--blush));
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.den-chat-header-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.den-chat-header-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--white); }
 .den-chat-header-name {
   font-family: 'Shippori Mincho', serif;
   font-weight: 600;
@@ -1843,16 +1926,39 @@ input:focus-visible {
 
 .den-msg-row {
   display: flex;
-  margin: 2px 0;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 1px 0;
+  animation: den-msg-in 0.32s var(--ease-out) both;
 }
+@keyframes den-msg-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.den-msg-row.is-tail { margin-bottom: 10px; }
 .den-msg-row.mine { justify-content: flex-end; }
+
+.den-msg-avatar {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--blush);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+.den-msg-avatar.is-spacer { visibility: hidden; }
+.den-msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .den-bubble {
   position: relative;
-  max-width: 68%;
+  max-width: 66%;
   background: #F4F1EF;
   color: var(--ink);
-  border-radius: 16px 16px 16px 4px;
+  border-radius: 17px 17px 17px 17px;
   padding: 9px 14px;
   font-family: 'Zen Kaku Gothic New', sans-serif;
   font-size: 13.5px;
@@ -1861,13 +1967,16 @@ input:focus-visible {
   display: flex;
   align-items: flex-end;
   gap: 8px;
+  box-shadow: 0 1px 2px rgba(28, 19, 16, 0.06);
 }
+.den-bubble.is-tail { border-bottom-left-radius: 5px; }
 .den-bubble.mine {
   background: linear-gradient(135deg, var(--cherry-bright) 0%, var(--cherry) 100%);
   color: var(--white);
-  border-radius: 16px 16px 4px 16px;
-  box-shadow: 0 4px 12px rgba(196, 24, 60, 0.18);
+  border-radius: 17px 17px 17px 17px;
+  box-shadow: 0 4px 12px rgba(196, 24, 60, 0.2);
 }
+.den-bubble.mine.is-tail { border-bottom-right-radius: 5px; }
 .den-bubble-time {
   flex-shrink: 0;
   font-size: 9.5px;
@@ -1902,27 +2011,37 @@ input:focus-visible {
   flex-shrink: 0;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--line);
-  background: var(--white);
+  gap: 10px;
+  margin: 0 14px 14px;
+  padding: 10px 12px;
+  border-radius: 26px;
+  border: 1.3px solid var(--line);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px rgba(196, 24, 60, 0.08);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.den-composer:focus-within {
+  border-color: rgba(196, 24, 60, 0.4);
+  box-shadow: 0 12px 30px rgba(196, 24, 60, 0.14);
 }
 
 .den-emoji-toggle {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  border: 1.5px solid var(--line);
-  background: var(--white-soft);
+  border: none;
+  background: transparent;
   font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s ease, transform 0.15s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
-.den-emoji-toggle:hover { border-color: var(--cherry); transform: translateY(-1px); }
+.den-emoji-toggle:hover { background: var(--blush-soft); transform: translateY(-1px) scale(1.06); }
 
 .den-emoji-popover {
   position: absolute;
@@ -1953,21 +2072,23 @@ input:focus-visible {
   flex: 1;
   resize: none;
   max-height: 140px;
-  border: 1.5px solid var(--line);
-  border-radius: 20px;
-  padding: 9px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 16px;
+  padding: 7px 4px;
   font-family: 'Zen Kaku Gothic New', sans-serif;
   font-size: 13.5px;
   color: var(--ink);
   outline: none;
   line-height: 1.4;
-  transition: border-color 0.2s ease;
 }
-.den-composer-input:focus { border-color: var(--cherry); }
 .den-composer-input::placeholder { color: var(--ink-muted); }
 
 .den-send-btn {
+  position: relative;
   flex-shrink: 0;
+  overflow: hidden;
+  isolation: isolate;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -1979,11 +2100,29 @@ input:focus-visible {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 6px 14px rgba(196, 24, 60, 0.25);
-  transition: transform 0.15s var(--ease-out), opacity 0.2s ease;
+  transition: transform 0.25s var(--ease-out), box-shadow 0.3s var(--ease-out), opacity 0.2s ease;
 }
-.den-send-btn:hover:not(:disabled) { transform: translateY(-1px) scale(1.04); }
-.den-send-btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+.den-send-btn::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(from var(--angle, 0deg), var(--cherry-bright), var(--cherry), var(--blush), var(--cherry-bright));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.den-send-btn:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.06);
+  box-shadow: 0 10px 22px rgba(196, 24, 60, 0.35);
+  animation: cta-spin-border 2.4s linear infinite;
+}
+.den-send-btn:hover:not(:disabled)::before { opacity: 1; }
+.den-send-btn:active:not(:disabled) { transform: translateY(0) scale(0.95); }
 .den-send-btn:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+.den-send-btn .cta-ripple-layer { z-index: 0; }
+.den-send-btn .cta-ripple { background: rgba(255, 255, 255, 0.5); }
+.den-send-btn svg { position: relative; z-index: 1; }
 
 @media (max-width: 720px) {
   .den-shell { grid-template-columns: 1fr; height: auto; }
@@ -2112,6 +2251,242 @@ input:focus-visible {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .space-card.interactive:hover { box-shadow: 0 10px 26px rgba(196, 24, 60, 0.09); transform: translateY(-1px); }
+
+/* ---------- Profile summary card (Space sidebar) ---------- */
+.profile-card {
+  position: relative;
+  padding: 22px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+}
+.profile-card-edit {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--blush-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-out), background 0.25s ease;
+}
+.profile-card:hover .profile-card-edit { transform: rotate(-8deg) scale(1.08); background: var(--blush); }
+.profile-card-avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 2px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--cherry-bright), var(--blush));
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+.profile-card:hover .profile-card-avatar { transform: scale(1.05); box-shadow: 0 0 0 4px rgba(196, 24, 60, 0.1); }
+.profile-card-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--white);
+}
+.profile-card-name {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: var(--ink);
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 600;
+}
+.profile-card-username { margin: 0 0 10px; font-size: 12px; color: var(--ink-muted); font-family: 'Zen Kaku Gothic New', sans-serif; }
+.profile-card-bio { margin: 0 0 10px; font-size: 12px; color: var(--ink); font-family: 'Zen Kaku Gothic New', sans-serif; line-height: 1.4; }
+.profile-card-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  width: 100%;
+  justify-content: center;
+}
+.profile-card-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.profile-card-stat strong {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  color: var(--cherry);
+}
+.profile-card-stat span {
+  color: var(--ink-muted);
+  font-size: 10px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ---------- My Space grid (Flashes + lingering Blurts) ---------- */
+.space-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.space-grid-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--ink-muted);
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 13.5px;
+  border: 1.5px dashed var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+}
+.space-grid-empty span { font-size: 28px; }
+
+/* ---------- My Space stat strip ---------- */
+.space-stat-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+.space-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.3px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  backdrop-filter: blur(6px);
+}
+.space-stat-pill strong { font-family: 'Shippori Mincho', serif; font-size: 14px; color: var(--cherry-deep); }
+.space-stat-pill.is-gold { border-color: rgba(201, 162, 75, 0.4); }
+.space-stat-pill.is-gold strong { color: var(--gold-deep); }
+
+/* ---------- Flash preview panel ---------- */
+.space-preview-panel {
+  max-width: 420px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  animation: haven-fade-up 0.3s var(--ease-out) both;
+}
+.space-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.space-preview-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--cherry-deep);
+}
+.space-preview-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+.space-preview-close:hover { color: var(--cherry-bright); border-color: rgba(255, 59, 92, 0.4); background: var(--blush-soft); transform: rotate(90deg); }
+
+@keyframes space-tile-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.space-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: #10080a;
+  animation: space-tile-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), border-color 0.3s ease;
+}
+.space-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(196, 24, 60, 0.16);
+  border-color: rgba(196, 24, 60, 0.3);
+}
+.space-tile-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s var(--ease-out), filter 0.4s ease;
+}
+.space-tile:hover .space-tile-media { transform: scale(1.06); }
+.space-tile.is-fallen .space-tile-media { filter: grayscale(0.85); opacity: 0.6; }
+.space-tile-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.space-tile:hover .space-tile-overlay { opacity: 1; }
+.space-tile-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.space-tile-blurt {
+  cursor: default;
+  background: linear-gradient(160deg, #fff4f6, #ffe9ec);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px;
+  text-align: center;
+}
+.space-tile-blurt:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(196, 24, 60, 0.12); border-color: rgba(196, 24, 60, 0.28); }
+.space-tile-blurt-icon { font-size: 18px; opacity: 0.85; }
+.space-tile-blurt-text {
+  margin: 0;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
 
 /* Composer mode tabs — see full premium composer system further down this file. */
 

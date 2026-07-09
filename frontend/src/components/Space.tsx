@@ -155,56 +155,36 @@ export default function Space({ onLogout }: SpaceProps) {
             type="button"
             onClick={() => setTab("settings")}
             title="Edit your profile"
-            className="space-card interactive"
+            className="space-card interactive profile-card"
             style={{
               borderColor: tab === "settings" ? "var(--cherry)" : undefined,
-              padding: "20px 16px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              textAlign: "center",
-              cursor: "pointer",
-              position: "relative",
             }}
           >
-            <span
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                width: 22,
-                height: 22,
-                borderRadius: "50%",
-                background: "var(--blush-soft)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            <span className="profile-card-edit" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--cherry)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 20h9" />
                 <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
               </svg>
             </span>
-            <div style={{ width: 60, height: 60, borderRadius: "50%", overflow: "hidden", border: "2px solid var(--cherry)", marginBottom: 12 }}>
-              <img src={avatar} alt={displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-            <h3 style={{ margin: "0 0 4px", fontSize: 16, color: "var(--ink)", fontFamily: "'Shippori Mincho', serif" }}>{displayName}</h3>
-            <p style={{ margin: "0 0 10px", fontSize: 12, color: "var(--ink-muted)" }}>@{username}</p>
-            {profile?.bio && <p style={{ margin: "0 0 10px", fontSize: 12, color: "var(--ink)" }}>{profile.bio}</p>}
+            <span className="profile-card-avatar">
+              <img src={avatar} alt={displayName} />
+            </span>
+            <h3 className="profile-card-name">{displayName}</h3>
+            <p className="profile-card-username">@{username}</p>
+            {profile?.bio && <p className="profile-card-bio">{profile.bio}</p>}
 
-            <div style={{ display: "flex", gap: 16, fontSize: 12, borderTop: "1px solid var(--line)", paddingTop: 10, width: "100%", justifyContent: "center" }}>
-              <div>
-                <strong style={{ display: "block", color: "var(--cherry)" }}>{counts.tenders}</strong>
-                <span style={{ color: "var(--ink-muted)", fontSize: 10 }}>Tenders</span>
+            <div className="profile-card-stats">
+              <div className="profile-card-stat">
+                <strong>{counts.tenders}</strong>
+                <span>Tenders</span>
               </div>
-              <div>
-                <strong style={{ display: "block", color: "var(--cherry)" }}>{counts.tended}</strong>
-                <span style={{ color: "var(--ink-muted)", fontSize: 10 }}>Tended</span>
+              <div className="profile-card-stat">
+                <strong>{counts.tended}</strong>
+                <span>Tended</span>
               </div>
             </div>
           </button>
+
 
           <nav className="space-nav">
             {navItem("feed", "Feed")}
@@ -255,8 +235,33 @@ export default function Space({ onLogout }: SpaceProps) {
 
         {tab === "space" && (
           <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
-            <SpaceGrid flashes={myFlashes} blurts={myBlurts} onSelectFlash={setSelectedFlash} />
+            <div>
+              <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
+              <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
+                Everything you've let linger, and what's still sealed away.
+              </p>
+            </div>
+
+            <div className="space-stat-strip">
+              <span className="space-stat-pill">
+                <strong>{myFlashes.filter((p) => !p.fallen).length}</strong> live Flashes
+              </span>
+              <span className="space-stat-pill">
+                <strong>{myBlurts.filter((w) => w.lingering).length}</strong> lingering Blurts
+              </span>
+              <span className="space-stat-pill is-gold">
+                <strong>{myVaults.length}</strong> sealed Vaults
+              </span>
+            </div>
+
+            <div>
+              <div className="vault-chamber-header">
+                <span className="vault-chamber-title">Live in your Space</span>
+                <span className="vault-chamber-line" aria-hidden="true" />
+              </div>
+              <SpaceGrid flashes={myFlashes} blurts={myBlurts} onSelectFlash={setSelectedFlash} />
+            </div>
+
             {myVaults.length > 0 && (
               <div>
                 <div className="vault-chamber-header">
@@ -269,8 +274,18 @@ export default function Space({ onLogout }: SpaceProps) {
               </div>
             )}
             {selectedFlash && (
-              <div style={{ maxWidth: 420, marginTop: 12 }}>
-                <FlashCard flash={selectedFlash} />
+              <div className="space-preview-panel">
+                <div className="space-preview-header">
+                  <span className="space-preview-title">Viewing Flash</span>
+                  <button type="button" className="space-preview-close" onClick={() => setSelectedFlash(null)} aria-label="Close preview">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div style={{ maxWidth: 420 }}>
+                  <FlashCard flash={selectedFlash} />
+                </div>
               </div>
             )}
           </div>
