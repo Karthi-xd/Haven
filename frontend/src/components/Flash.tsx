@@ -51,7 +51,12 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
 
       {showAuthor && (
         <div className="post-header">
-          <span className="post-author">@{flash.author.username}</span>
+          <div className="post-author-group">
+            <span className="post-avatar" aria-hidden="true">
+              <img src={flash.author.avatar_url} alt="" />
+            </span>
+            <span className="post-author">@{flash.author.username}</span>
+          </div>
           <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
             {!fallen && <span className="dot" aria-hidden="true" />}
             {fallen ? "fallen" : life.label}

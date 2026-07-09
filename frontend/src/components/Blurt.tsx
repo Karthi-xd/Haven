@@ -57,7 +57,12 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
     <div className={cardClass}>
       {showAuthor && (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <span className="post-author">@{blurt.author.username}</span>
+          <div className="post-author-group">
+            <span className="post-avatar" aria-hidden="true">
+              <img src={blurt.author.avatar_url} alt="" />
+            </span>
+            <span className="post-author">@{blurt.author.username}</span>
+          </div>
           {lingering ? (
             <span className="linger-badge">🌿 lingering</span>
           ) : (
