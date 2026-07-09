@@ -5,7 +5,7 @@ import { createVault } from "../api/vaults";
 import { uploadFlashMedia } from "../api/storage";
 import type { Flash, Blurt } from "../types";
 
-type Mode = "flash" | "blurt" | "vault";
+type Mode = "blurt" | "flash" | "vault";
 
 interface ComposerProps {
   onFlashCreated?: (p: Flash) => void;
@@ -13,8 +13,30 @@ interface ComposerProps {
   onVaultCreated?: () => void;
 }
 
+const MODES: Mode[] = ["blurt", "flash", "vault"];
 const BLURT_LIMIT = 280;
 const MAX_MEDIA_BYTES = 100 * 1024 * 1024; // 100MB
+
+type Ripple = { id: number; x: number; y: number };
+
+/** Fires a short-lived ripple from the click point — the same touch used on the landing CTA. */
+function useRipple() {
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  function trigger(e: React.MouseEvent<HTMLElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const id = Date.now() + Math.random();
+    setRipples((prev) => [...prev, { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
+    setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== id)), 700);
+  }
+  const layer = (
+    <span className="cta-ripple-layer" aria-hidden="true">
+      {ripples.map((r) => (
+        <span key={r.id} className="cta-ripple" style={{ left: r.x, top: r.y }} />
+      ))}
+    </span>
+  );
+  return { trigger, layer };
+}
 
 const MODE_ICONS: Record<Mode, ReactElement> = {
   blurt: (
@@ -39,10 +61,39 @@ const MODE_ICONS: Record<Mode, ReactElement> = {
 };
 
 const MODE_META: Record<Mode, { label: string; hint: string; cta: string; sendingLabel: string }> = {
-  blurt: { label: "Blurt", hint: "Say something quick — it falls in 24h unless you let it linger.", cta: "Blurt it", sendingLabel: "Sending…" },
-  flash: { label: "Flash", hint: "A photo or video, visible to everyone, gone in 24h.", cta: "Let it fall", sendingLabel: "Uploading…" },
-  vault: { label: "Vault", hint: "Seal a photo or video away until a future date, then it opens like any Flash.", cta: "Seal the Vault", sendingLabel: "Sealing…" },
+  blurt: { label: "Blurt", hint: "Say something quick — it reaches everyone on Haven and falls in 24h unless you let it linger.", cta: "Blurt it", sendingLabel: "Sending" },
+  flash: { label: "Flash", hint: "A photo or video, visible to everyone on Haven, gone in 24h.", cta: "Let it fall", sendingLabel: "Uploading" },
+  vault: { label: "Vault", hint: "Seal a photo or video away until a future date — it opens into a Flash for everyone, right on schedule.", cta: "Seal the Vault", sendingLabel: "Sealing" },
 };
+
+const UploadIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 4v10.5M8 8l4-4 4 4" />
+    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+  </svg>
+);
+const RemoveIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M18 6 6 18M6 6l12 12" />
+  </svg>
+);
+const ChevronIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+const AlertIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 8v5M12 16h.01" />
+  </svg>
+);
+const CalendarIcon = () => (
+  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3.5" y="5" width="17" height="16" rx="2.5" />
+    <path d="M8 3v4M16 3v4M3.5 10h17" />
+  </svg>
+);
 
 export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreated }: ComposerProps) {
   const [mode, setMode] = useState<Mode>("blurt");
@@ -58,8 +109,12 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const modeRipple = useRipple();
+  const submitRipple = useRipple();
+
   const remaining = BLURT_LIMIT - blurtBody.length;
   const meta = MODE_META[mode];
+  const modeIndex = MODES.indexOf(mode);
 
   useEffect(() => {
     if (!file) {
@@ -107,6 +162,13 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
     setUnlocksAt("");
   }
 
+  function switchMode(m: Mode, e: React.MouseEvent<HTMLButtonElement>) {
+    if (m === mode) return;
+    modeRipple.trigger(e);
+    setMode(m);
+    setError("");
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
@@ -149,43 +211,53 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
   }
 
   return (
-    <div
-      className="space-card"
-      style={{
-        padding: 20,
-        display: "flex",
-        flexDirection: "column",
-        gap: 14,
-      }}
-    >
-      <div style={{ display: "flex", gap: 8 }}>
-        {(["blurt", "flash", "vault"] as Mode[]).map((m) => (
+    <div className={`space-card composer-shell mode-${mode}`}>
+      {/* ---------- Segmented mode switcher ---------- */}
+      <div className="composer-modes" style={{ ["--index" as any]: modeIndex }}>
+        <span className="composer-modes-indicator" aria-hidden="true" />
+        {MODES.map((m) => (
           <button
             key={m}
             type="button"
-            className={`composer-tab${mode === m ? " active" : ""}`}
-            onClick={() => { setMode(m); setError(""); }}
+            onClick={(e) => switchMode(m, e)}
+            className={`composer-mode-btn${mode === m ? " active" : ""}`}
+            aria-pressed={mode === m}
           >
-            <span aria-hidden="true">{MODE_ICONS[m]}</span> {MODE_META[m].label}
+            <span aria-hidden="true">{MODE_ICONS[m]}</span>
+            <span className="composer-mode-label">{MODE_META[m].label}</span>
+            {modeRipple.layer}
           </button>
         ))}
       </div>
 
-      <p style={{ margin: 0, fontSize: 12, color: "var(--ink-muted)" }}>{meta.hint}</p>
+      <p key={`hint-${mode}`} className="composer-hint">{meta.hint}</p>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <form onSubmit={handleSubmit} key={mode} className="composer-panel">
         {mode === "blurt" && (
-          <div>
+          <div className="composer-textarea-wrap">
             <textarea
               value={blurtBody}
               onChange={(e) => setBlurtBody(e.target.value.slice(0, BLURT_LIMIT))}
               maxLength={BLURT_LIMIT}
-              placeholder="Blurt something…"
+              placeholder="Blurt something everyone on Haven will see…"
               rows={3}
-              style={{ width: "100%", border: "1px solid var(--line)", borderRadius: 14, padding: 12, fontSize: 14, resize: "vertical", fontFamily: "inherit" }}
+              className="composer-textarea"
+              autoFocus
             />
-            <div style={{ textAlign: "right", fontSize: 11, color: remaining < 20 ? "var(--cherry)" : "var(--ink-muted)", marginTop: 4 }}>
-              {remaining} left
+            <div className="composer-counter-row">
+              <span className={`composer-counter-text${remaining < 20 ? " is-low" : ""}`}>{remaining} left</span>
+              <svg className="composer-ring" viewBox="0 0 24 24">
+                <circle className="ring-track" cx="12" cy="12" r="10" />
+                <circle
+                  className="ring-fill"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  strokeDasharray={2 * Math.PI * 10}
+                  strokeDashoffset={2 * Math.PI * 10 * (1 - blurtBody.length / BLURT_LIMIT)}
+                  style={{ stroke: remaining < 20 ? "var(--cherry-deep)" : "var(--cherry)" }}
+                />
+              </svg>
             </div>
           </div>
         )}
@@ -198,7 +270,6 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`composer-dropzone${dragActive ? " is-drag-active" : ""}`}
-              style={{ padding: previewUrl ? 10 : 24, textAlign: "center" }}
             >
               <input
                 ref={fileInputRef}
@@ -208,31 +279,30 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
                 style={{ display: "none" }}
               />
               {previewUrl ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {file?.type.startsWith("video") ? (
-                    <video src={previewUrl} style={{ width: 88, height: 88, objectFit: "cover", borderRadius: 10 }} muted />
-                  ) : (
-                    <img src={previewUrl} alt="preview" style={{ width: 88, height: 88, objectFit: "cover", borderRadius: 10 }} />
-                  )}
-                  <div style={{ textAlign: "left", flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{file?.name}</div>
+                <div className="composer-preview">
+                  <div className="composer-preview-thumb">
+                    {file?.type.startsWith("video") ? (
+                      <video src={previewUrl} muted />
+                    ) : (
+                      <img src={previewUrl} alt="preview" />
+                    )}
+                  </div>
+                  <div className="composer-preview-info">
+                    <span className="composer-preview-name">{file?.name}</span>
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); pickFile(null); }}
-                      style={{ border: "none", background: "transparent", color: "var(--cherry)", fontSize: 12, textDecoration: "underline", cursor: "pointer", padding: 0, marginTop: 4 }}
+                      className="composer-remove-chip"
                     >
-                      Remove
+                      <RemoveIcon /> Remove
                     </button>
                   </div>
                 </div>
               ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-muted)" }}>
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M12 4v10.5M8 8l4-4 4 4" />
-                    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
-                  </svg>
+                <div className="composer-dropzone-empty">
+                  <span className="composer-dropzone-icon"><UploadIcon /></span>
                   Drop a photo or video here, or click to choose one
-                </span>
+                </div>
               )}
             </div>
 
@@ -242,46 +312,71 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Caption (optional)"
               className="feed-input"
-              style={{ fontSize: 14, padding: "10px 14px" }}
             />
           </>
         )}
 
         {mode === "vault" && (
-          <label style={{ fontSize: 12.5, color: "var(--ink-muted)", display: "flex", flexDirection: "column", gap: 4 }}>
-            Unlocks at
+          <label className="composer-field-label">
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <CalendarIcon /> Unlocks at
+            </span>
             <input
               type="datetime-local"
               value={unlocksAt}
               min={minUnlockLocal}
               onChange={(e) => setUnlocksAt(e.target.value)}
-              style={{ border: "1px solid var(--line)", borderRadius: 10, padding: "8px 12px", fontSize: 14 }}
+              className="composer-datetime"
+              style={{ textTransform: "none", letterSpacing: "normal", fontWeight: 400 }}
             />
           </label>
         )}
 
         {(mode === "flash" || mode === "vault") && (
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <button
               type="button"
               onClick={() => setShowAdvanced((v) => !v)}
-              style={{ border: "none", background: "transparent", color: "var(--ink-muted)", fontSize: 11.5, textDecoration: "underline", cursor: "pointer", padding: 0 }}
+              className={`composer-disclosure${showAdvanced ? " is-open" : ""}`}
             >
-              {showAdvanced ? "Hide" : "More options"}
+              More options <ChevronIcon />
             </button>
             {showAdvanced && (
-              <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "var(--ink-muted)", marginTop: 6 }}>
-                <input type="checkbox" checked={followersOnly} onChange={(e) => setFollowersOnly(e.target.checked)} />
-                Restrict this {mode === "vault" ? "Vault" : "Flash"} to followers only
-              </label>
+              <div className="composer-advanced">
+                <span className="composer-advanced-label">
+                  Restrict this {mode === "vault" ? "Vault" : "Flash"} to followers only
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={followersOnly}
+                  onClick={() => setFollowersOnly((v) => !v)}
+                  className={`composer-switch${followersOnly ? " is-on" : ""}`}
+                >
+                  <span className="composer-switch-thumb" />
+                </button>
+              </div>
             )}
           </div>
         )}
 
-        {error && <p style={{ color: "var(--cherry-deep)", fontSize: 12.5, margin: 0 }}>{error}</p>}
+        {error && (
+          <p className="composer-error">
+            <AlertIcon /> {error}
+          </p>
+        )}
 
-        <button type="submit" disabled={submitting} className="btn btn-primary composer-submit" style={{ alignSelf: "flex-start" }}>
-          {submitting ? meta.sendingLabel : meta.cta}
+        <button
+          type="submit"
+          disabled={submitting}
+          className="composer-submit"
+          onClick={(e) => submitRipple.trigger(e)}
+        >
+          <span className="composer-submit-icon" aria-hidden="true">
+            {submitting ? <span className="composer-spinner" /> : MODE_ICONS[mode]}
+          </span>
+          <span className="composer-submit-label">{submitting ? `${meta.sendingLabel}…` : meta.cta}</span>
+          {submitRipple.layer}
         </button>
       </form>
     </div>

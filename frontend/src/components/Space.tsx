@@ -259,7 +259,7 @@ export default function Space({ onLogout }: SpaceProps) {
             <SpaceGrid flashes={myFlashes} blurts={myBlurts} onSelectFlash={setSelectedFlash} />
             {myVaults.length > 0 && (
               <div>
-                <h3 style={{ fontSize: 14, color: "var(--ink-muted)", margin: "20px 0 10px" }}>Sealed Vaults</h3>
+                <h3 style={{ fontFamily: "Shippori Mincho, serif", fontWeight: 600, fontSize: 15.5, letterSpacing: "0.03em", color: "var(--gold-deep)", margin: "20px 0 10px" }}>Sealed Vaults</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
                   {myVaults.map((b) => <VaultCard key={b.id} vault={b} onDeleted={refreshMine} />)}
                 </div>
