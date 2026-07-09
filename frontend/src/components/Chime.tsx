@@ -35,14 +35,16 @@ export default function Chime({ targetKind, targetId }: ChimeProps) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
+    <div className="chime-panel">
       {loading ? (
-        <p style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>Loading chimes…</p>
+        <p className="chime-empty">Loading chimes…</p>
+      ) : chimes.length === 0 ? (
+        <p className="chime-empty">No chimes yet — be the first to say something.</p>
       ) : (
         chimes.map((s) => (
-          <div key={s.id} style={{ display: "flex", gap: 8, fontSize: 13 }}>
-            <span style={{ fontWeight: 700, color: "var(--cherry)" }}>@{s.author.username}</span>
-            <span style={{ color: "var(--ink)" }}>{s.body}</span>
+          <div key={s.id} className="chime-row">
+            <span className="chime-author">@{s.author.username}</span>
+            <span className="chime-body">{s.body}</span>
           </div>
         ))
       )}
@@ -53,30 +55,9 @@ export default function Chime({ targetKind, targetId }: ChimeProps) {
           onChange={(e) => setBody(e.target.value)}
           placeholder="Add a Chime…"
           maxLength={280}
-          style={{
-            flex: 1,
-            border: "1px solid var(--line)",
-            borderRadius: 999,
-            padding: "8px 14px",
-            fontSize: 13,
-            outline: "none",
-          }}
+          className="feed-input"
         />
-        <button
-          type="submit"
-          disabled={posting || !body.trim()}
-          style={{
-            border: "none",
-            background: "var(--cherry)",
-            color: "#fff",
-            borderRadius: 999,
-            padding: "8px 16px",
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: "pointer",
-            opacity: posting || !body.trim() ? 0.6 : 1,
-          }}
-        >
+        <button type="submit" disabled={posting || !body.trim()} className="feed-btn is-solid is-sm">
           Chime
         </button>
       </form>

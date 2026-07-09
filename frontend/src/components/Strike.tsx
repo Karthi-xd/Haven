@@ -33,20 +33,10 @@ export default function Strike({ targetKind, targetId, active: initialActive = f
       onClick={handleClick}
       aria-pressed={active}
       title="Strike"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        border: "none",
-        background: "transparent",
-        cursor: "pointer",
-        color: active ? "#8a6b52" : "var(--ink-muted)",
-        fontSize: 15,
-        padding: "4px 8px",
-        borderRadius: 999,
-        opacity: active ? 1 : 0.65,
-      }}
+      className={`feed-btn is-sm is-quiet${active ? " is-active-strike" : ""}`}
+      style={{ opacity: active ? 1 : 0.75 }}
     >
-      <span aria-hidden="true">{active ? "🥀" : "🍂"}</span>
+      <span className="feed-btn-icon" aria-hidden="true">{active ? "🥀" : "🍂"}</span>
     </button>
   );
 }

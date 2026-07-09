@@ -15,12 +15,16 @@ export default function Spark({ targetKind, targetId, count: initialCount, activ
   const [count, setCount] = useState(initialCount);
   const [busy, setBusy] = useState(false);
 
+  const [pop, setPop] = useState(false);
+
   async function handleClick() {
     if (busy) return;
     setBusy(true);
     const next = !active;
     setActive(next);
     setCount((c) => c + (next ? 1 : -1));
+    setPop(true);
+    setTimeout(() => setPop(false), 400);
     try {
       await toggleSpark(targetKind, targetId);
     } catch {
@@ -37,22 +41,9 @@ export default function Spark({ targetKind, targetId, count: initialCount, activ
       onClick={handleClick}
       aria-pressed={active}
       title="Spark — this changed how I see things"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        border: active ? "1.5px solid var(--cherry-deep)" : "1.5px solid var(--line)",
-        background: active ? "rgba(196,24,60,0.08)" : "transparent",
-        cursor: "pointer",
-        color: active ? "var(--cherry-deep)" : "var(--ink-muted)",
-        fontSize: 12.5,
-        fontWeight: 700,
-        padding: "4px 10px",
-        borderRadius: 999,
-        transition: "all 0.15s ease",
-      }}
+      className={`feed-btn is-sm${active ? " is-solid" : ""}${pop ? " is-popping" : ""}`}
     >
-      <span aria-hidden="true">🌺</span>
+      <span className="feed-btn-icon" aria-hidden="true">🌺</span>
       <span>{count > 0 ? count : "Spark"}</span>
     </button>
   );

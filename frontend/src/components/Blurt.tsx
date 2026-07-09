@@ -47,29 +47,21 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
   const fallen = !lingering && (blurt.fallen || life.expired);
   const cardClass = [
     "post-card",
+    "post-blurt",
     justFell ? "is-falling" : fallen ? "is-fallen" : life.isLastMinute ? "is-last-minute" : life.isDying ? "is-dying" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div
-      className={cardClass}
-      style={{
-        background: "#fff",
-        border: "1px solid var(--line)",
-        borderRadius: 18,
-        padding: "16px 18px",
-        boxShadow: "0 6px 20px rgba(122,15,38,0.03)",
-      }}
-    >
+    <div className={cardClass}>
       {showAuthor && (
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <span style={{ fontWeight: 700, fontSize: 13.5, color: "var(--ink)" }}>@{blurt.author.username}</span>
+          <span className="post-author">@{blurt.author.username}</span>
           {lingering ? (
             <span className="linger-badge">🌿 lingering</span>
           ) : (
-            <span className={`life-badge${fallen ? " fallen" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
+            <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
               {!fallen && <span className="dot" aria-hidden="true" />}
               {fallen ? "fallen" : life.label}
             </span>
@@ -77,7 +69,7 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
         </div>
       )}
 
-      <p style={{ margin: 0, fontSize: 15.5, color: "var(--ink)", lineHeight: 1.5 }}>{blurt.body}</p>
+      <p className="post-body-text">{blurt.body}</p>
 
       {!lingering && !fallen && (
         <div className="life-bar-track" style={{ marginTop: 10 }}>
@@ -88,16 +80,17 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
         </div>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10 }}>
+      <div className="post-actions">
         <BuzzButton targetKind="blurt" targetId={blurt.id} count={blurt.buzz_count} />
         <StrikeButton targetKind="blurt" targetId={blurt.id} />
         <SparkButton targetKind="blurt" targetId={blurt.id} count={blurt.spark_count} />
         <button
           type="button"
           onClick={() => setShowChimes((v) => !v)}
-          style={{ border: "none", background: "transparent", color: "var(--ink-muted)", fontSize: 12.5, cursor: "pointer" }}
+          className="feed-btn is-sm is-quiet"
         >
-          🔔 {blurt.chime_count}
+          <span className="feed-btn-icon" aria-hidden="true">🔔</span>
+          <span>{blurt.chime_count}</span>
         </button>
 
         {isOwn && !lingering && (
@@ -106,29 +99,15 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
             onClick={handleLinger}
             disabled={busy}
             title="Stop the 24h countdown and keep this Blurt on your Space forever"
-            style={{
-              marginLeft: "auto",
-              border: "1px solid var(--line)",
-              background: "transparent",
-              color: "var(--cherry)",
-              fontSize: 11.5,
-              fontWeight: 600,
-              borderRadius: 999,
-              padding: "4px 10px",
-              cursor: "pointer",
-              opacity: busy ? 0.6 : 1,
-            }}
+            className="feed-btn is-sm"
+            style={{ marginLeft: "auto" }}
           >
             {busy ? "Lingering…" : "Let it linger"}
           </button>
         )}
       </div>
 
-      {showChimes && (
-        <div style={{ marginTop: 8 }}>
-          <Chime targetKind="blurt" targetId={blurt.id} />
-        </div>
-      )}
+      {showChimes && <Chime targetKind="blurt" targetId={blurt.id} />}
     </div>
   );
 }

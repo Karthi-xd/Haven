@@ -26,21 +26,30 @@ export default function Feed({ flashes, blurts, currentUserId, onFlashFallen, on
   }, [flashes, blurts]);
 
   if (items.length === 0) {
-    return <p className="feed-empty">Nothing's alive right now — be the first to plant something today.</p>;
+    return (
+      <div className="feed-empty">
+        <span style={{ fontSize: 30 }} aria-hidden="true">🌸</span>
+        <span className="feed-empty-title">Nothing's alive right now</span>
+        <span>Be the first to Blurt or Flash something today.</span>
+      </div>
+    );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 640 }}>
-      {items.map((item) =>
+    <div className="feed-shell">
+      {items.map((item, i) =>
         item.kind === "flash" ? (
-          <FlashCard key={`flash-${item.data.id}`} flash={item.data} onFallen={onFlashFallen} />
+          <div className="feed-item" style={{ ["--i" as any]: i }} key={`flash-${item.data.id}`}>
+            <FlashCard flash={item.data} onFallen={onFlashFallen} />
+          </div>
         ) : (
-          <BlurtCard
-            key={`blurt-${item.data.id}`}
-            blurt={item.data}
-            isOwn={item.data.author.id === currentUserId}
-            onFallen={onBlurtFallen}
-          />
+          <div className="feed-item" style={{ ["--i" as any]: i }} key={`blurt-${item.data.id}`}>
+            <BlurtCard
+              blurt={item.data}
+              isOwn={item.data.author.id === currentUserId}
+              onFallen={onBlurtFallen}
+            />
+          </div>
         )
       )}
     </div>

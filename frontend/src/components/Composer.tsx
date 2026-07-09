@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type DragEvent, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent, type FormEvent, type ReactElement } from "react";
 import { createFlash } from "../api/flashes";
 import { createBlurt } from "../api/blurts";
 import { createVault } from "../api/vaults";
@@ -16,7 +16,7 @@ interface ComposerProps {
 const BLURT_LIMIT = 280;
 const MAX_MEDIA_BYTES = 100 * 1024 * 1024; // 100MB
 
-const MODE_ICONS: Record<Mode, JSX.Element> = {
+const MODE_ICONS: Record<Mode, ReactElement> = {
   blurt: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 19.5 5.2 15 16 4.2a2 2 0 0 1 2.8 0l1 1a2 2 0 0 1 0 2.8L8.9 18.8Z" />
@@ -197,15 +197,8 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
               onDragLeave={() => setDragActive(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              style={{
-                border: `1.5px dashed ${dragActive ? "var(--cherry)" : "var(--line)"}`,
-                borderRadius: 16,
-                padding: previewUrl ? 10 : 24,
-                textAlign: "center",
-                cursor: "pointer",
-                background: dragActive ? "var(--blush-soft)" : "transparent",
-                transition: "border-color 0.2s ease, background 0.2s ease",
-              }}
+              className={`composer-dropzone${dragActive ? " is-drag-active" : ""}`}
+              style={{ padding: previewUrl ? 10 : 24, textAlign: "center" }}
             >
               <input
                 ref={fileInputRef}
@@ -248,7 +241,8 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Caption (optional)"
-              style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "10px 14px", fontSize: 14 }}
+              className="feed-input"
+              style={{ fontSize: 14, padding: "10px 14px" }}
             />
           </>
         )}
@@ -286,7 +280,7 @@ export default function Composer({ onFlashCreated, onBlurtCreated, onVaultCreate
 
         {error && <p style={{ color: "var(--cherry-deep)", fontSize: 12.5, margin: 0 }}>{error}</p>}
 
-        <button type="submit" disabled={submitting} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
+        <button type="submit" disabled={submitting} className="btn btn-primary composer-submit" style={{ alignSelf: "flex-start" }}>
           {submitting ? meta.sendingLabel : meta.cta}
         </button>
       </form>

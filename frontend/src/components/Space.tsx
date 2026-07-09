@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { fetchMe } from "../api/auth";
 import { fetchSpaceFlashes } from "../api/flashes";
 import { fetchSpaceBlurts } from "../api/blurts";
@@ -73,7 +73,7 @@ export default function Space({ onLogout }: SpaceProps) {
   const username = profile?.username || "explorer";
   const avatar = profile?.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=haven";
 
-  const NAV_ICONS: Record<Tab, JSX.Element> = {
+  const NAV_ICONS: Record<Tab, ReactElement> = {
     feed: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 10.5 12 3l9 7.5" />

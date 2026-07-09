@@ -13,6 +13,7 @@ export default function Buzz({ targetKind, targetId, count: initialCount, active
   const [active, setActive] = useState(initialActive);
   const [count, setCount] = useState(initialCount);
   const [busy, setBusy] = useState(false);
+  const [pop, setPop] = useState(false);
 
   async function handleClick() {
     if (busy) return;
@@ -20,6 +21,8 @@ export default function Buzz({ targetKind, targetId, count: initialCount, active
     const next = !active;
     setActive(next);
     setCount((c) => c + (next ? 1 : -1));
+    setPop(true);
+    setTimeout(() => setPop(false), 400);
     try {
       await toggleBuzz(targetKind, targetId);
     } catch {
@@ -37,22 +40,9 @@ export default function Buzz({ targetKind, targetId, count: initialCount, active
       onClick={handleClick}
       aria-pressed={active}
       title="Buzz"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        border: "none",
-        background: "transparent",
-        cursor: "pointer",
-        color: active ? "var(--cherry)" : "var(--ink-muted)",
-        fontSize: 13,
-        fontWeight: active ? 700 : 500,
-        padding: "4px 8px",
-        borderRadius: 999,
-        transition: "color 0.15s ease",
-      }}
+      className={`feed-btn is-sm${active ? " is-solid" : ""}${pop ? " is-popping" : ""}`}
     >
-      <span aria-hidden="true">{active ? "🌸" : "🤍"}</span>
+      <span className="feed-btn-icon" aria-hidden="true">{active ? "🌸" : "🤍"}</span>
       <span>{count}</span>
     </button>
   );

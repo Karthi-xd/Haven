@@ -69,8 +69,9 @@ export function useLifespan(postedAt: string, expiresAt: string | null, alreadyF
 }
 
 /** Simpler one-way countdown for a sealed Vault counting down to unlocks_at. */
-export function useCountdown(targetAt: string) {
+export function useCountdown(targetAt: string, startAt?: string) {
   const targetMs = useMemo(() => new Date(targetAt).getTime(), [targetAt]);
+  const startMs = useMemo(() => (startAt ? new Date(startAt).getTime() : null), [startAt]);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -80,6 +81,10 @@ export function useCountdown(targetAt: string) {
 
   const remainingMs = Math.max(targetMs - now, 0);
   const reached = remainingMs <= 0;
+  /** 0 = just sealed, 1 = right at the unlock moment. Only meaningful if startAt was passed. */
+  const fraction = startMs
+    ? Math.min(1, Math.max(0, 1 - remainingMs / Math.max(targetMs - startMs, 1)))
+    : 0;
 
   let label: string;
   if (reached) {
@@ -100,5 +105,5 @@ export function useCountdown(targetAt: string) {
     label = `unlocks in ${Math.ceil(remainingMs / SECOND)}s`;
   }
 
-  return { remainingMs, reached, label };
+  return { remainingMs, reached, label, fraction };
 }

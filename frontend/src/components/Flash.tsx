@@ -32,22 +32,14 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
   const fallen = flash.fallen || life.expired;
   const cardClass = [
     "post-card",
+    "post-flash",
     justFell ? "is-falling" : fallen ? "is-fallen" : life.isLastMinute ? "is-last-minute" : life.isDying ? "is-dying" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div
-      className={cardClass}
-      style={{
-        background: "#fff",
-        border: "1px solid var(--line)",
-        borderRadius: 20,
-        overflow: "hidden",
-        boxShadow: "0 6px 20px rgba(122,15,38,0.04)",
-      }}
-    >
+    <div className={cardClass}>
       {!fallen && (
         <div className="life-bar-track">
           <div
@@ -58,9 +50,9 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
       )}
 
       {showAuthor && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px" }}>
-          <span style={{ fontWeight: 700, fontSize: 13.5, color: "var(--ink)" }}>@{flash.author.username}</span>
-          <span className={`life-badge${fallen ? " fallen" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
+        <div className="post-header">
+          <span className="post-author">@{flash.author.username}</span>
+          <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
             {!fallen && <span className="dot" aria-hidden="true" />}
             {fallen ? "fallen" : life.label}
             {flash.followers_only ? " · followers only" : ""}
@@ -68,24 +60,27 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
         </div>
       )}
 
-      {flash.media_kind === "video" ? (
-        <video src={flash.media_url} controls style={{ width: "100%", maxHeight: 480, objectFit: "cover" }} />
-      ) : (
-        <img src={flash.media_url} alt={flash.caption} style={{ width: "100%", maxHeight: 480, objectFit: "cover" }} />
-      )}
+      <div className="flash-media-wrap">
+        {flash.media_kind === "video" ? (
+          <video src={flash.media_url} controls />
+        ) : (
+          <img src={flash.media_url} alt={flash.caption} />
+        )}
+        {flash.caption && <p className="flash-caption-overlay">{flash.caption}</p>}
+      </div>
 
-      {flash.caption && <p style={{ padding: "10px 16px 0", fontSize: 14, color: "var(--ink)" }}>{flash.caption}</p>}
-
-      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px 12px" }}>
+      <div className="post-actions">
         <BuzzButton targetKind="flash" targetId={flash.id} count={flash.buzz_count} />
         <StrikeButton targetKind="flash" targetId={flash.id} />
         <SparkButton targetKind="flash" targetId={flash.id} count={flash.spark_count} />
         <button
           type="button"
           onClick={() => setShowChimes((v) => !v)}
-          style={{ marginLeft: "auto", border: "none", background: "transparent", color: "var(--ink-muted)", fontSize: 12.5, cursor: "pointer" }}
+          className="feed-btn is-sm is-quiet"
+          style={{ marginLeft: "auto" }}
         >
-          🔔 {flash.chime_count} Chimes
+          <span className="feed-btn-icon" aria-hidden="true">🔔</span>
+          <span>{flash.chime_count} Chimes</span>
         </button>
       </div>
 
