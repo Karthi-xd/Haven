@@ -226,9 +226,11 @@ export default function Space({ onLogout }: SpaceProps) {
             <Feed
               flashes={feedFlashes}
               blurts={feedBlurts}
+              vaults={myVaults}
               currentUserId={profile?.id}
               onFlashFallen={(id) => setFeedFlashes((prev) => prev.filter((f) => f.id !== id))}
               onBlurtFallen={(id) => setFeedBlurts((prev) => prev.filter((w) => w.lingering || w.id !== id))}
+              onVaultDeleted={refreshMine}
             />
           </div>
         )}
