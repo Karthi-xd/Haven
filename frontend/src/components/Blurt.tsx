@@ -56,24 +56,30 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
   return (
     <div className={cardClass}>
       {showAuthor && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <div className="post-author-group">
             <span className="post-avatar" aria-hidden="true">
               <img src={blurt.author.avatar_url} alt="" />
             </span>
             <span className="post-author">@{blurt.author.username}</span>
           </div>
-          {lingering ? (
-            <span className="linger-badge">🌿 lingering</span>
-          ) : (
-            <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
-              {!fallen && <span className="dot" aria-hidden="true" />}
-              {fallen ? "fallen" : life.label}
+          <div className="post-header-right">
+            <span className="kind-tag is-blurt">
+              <span aria-hidden="true">💬</span>Blurt
             </span>
-          )}
+            {lingering ? (
+              <span className="linger-badge">🌿 lingering</span>
+            ) : (
+              <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
+                {!fallen && <span className="dot" aria-hidden="true" />}
+                {fallen ? "fallen" : life.label}
+              </span>
+            )}
+          </div>
         </div>
       )}
 
+      <span className="post-blurt-quote" aria-hidden="true">&ldquo;</span>
       <p className="post-body-text">{blurt.body}</p>
 
       {!lingering && !fallen && (
