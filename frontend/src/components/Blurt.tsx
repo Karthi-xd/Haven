@@ -6,6 +6,7 @@ import BuzzButton from "./Buzz";
 import StrikeButton from "./Strike";
 import SparkButton from "./Spark";
 import Chime from "./Chime";
+import "./Feed.css";
 
 interface BlurtProps {
   blurt: BlurtType;
@@ -15,7 +16,7 @@ interface BlurtProps {
   onFallen?: (id: string) => void;
 }
 
-/** A single Blurt — short, tweet-like, falls in 24h unless it's set to linger. */
+/** A single Blurt — short, literary fragment. Falls in 24h unless it's set to linger. */
 export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFallen }: BlurtProps) {
   const [showChimes, setShowChimes] = useState(false);
   const [lingering, setLingering] = useState(blurt.lingering);
@@ -46,8 +47,7 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
 
   const fallen = !lingering && (blurt.fallen || life.expired);
   const cardClass = [
-    "post-card",
-    "post-blurt",
+    "hv-blurt-card",
     justFell ? "is-falling" : fallen ? "is-fallen" : life.isLastMinute ? "is-last-minute" : life.isDying ? "is-dying" : "",
   ]
     .filter(Boolean)
@@ -55,23 +55,25 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
 
   return (
     <div className={cardClass}>
+      <span className="hv-blurt-mark" aria-hidden="true">&ldquo;</span>
+
       {showAuthor && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <div className="post-author-group">
-            <span className="post-avatar" aria-hidden="true">
+        <div className="hv-blurt-head">
+          <div className="hv-blurt-author">
+            <span className="hv-blurt-avatar" aria-hidden="true">
               <img src={blurt.author.avatar_url} alt="" />
             </span>
-            <span className="post-author">@{blurt.author.username}</span>
+            <span className="hv-blurt-username">@{blurt.author.username}</span>
           </div>
-          <div className="post-header-right">
-            <span className="kind-tag is-blurt">
+          <div className="hv-blurt-meta">
+            <span className="hv-kind-tag is-blurt">
               <span aria-hidden="true">💬</span>Blurt
             </span>
             {lingering ? (
-              <span className="linger-badge">🌿 lingering</span>
+              <span className="hv-blurt-linger">🌿 lingering</span>
             ) : (
-              <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
-                {!fallen && <span className="dot" aria-hidden="true" />}
+              <span className={`hv-blurt-life${fallen ? " is-fallen" : ""}`}>
+                {!fallen && <span className="hv-dot" aria-hidden="true" />}
                 {fallen ? "fallen" : life.label}
               </span>
             )}
@@ -79,27 +81,22 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
         </div>
       )}
 
-      <span className="post-blurt-quote" aria-hidden="true">&ldquo;</span>
-      <p className="post-body-text">{blurt.body}</p>
+      <p className="hv-blurt-body">{blurt.body}</p>
 
       {!lingering && !fallen && (
-        <div className="life-bar-track" style={{ marginTop: 10 }}>
+        <div className="hv-blurt-life-track">
           <div
-            className={`life-bar-fill${life.isLastMinute ? " last-minute" : life.isDying ? " dying" : ""}`}
+            className={`hv-blurt-life-fill${life.isLastMinute ? " last-minute" : life.isDying ? " dying" : ""}`}
             style={{ width: `${Math.max(2, (1 - life.lifeFraction) * 100)}%` }}
           />
         </div>
       )}
 
-      <div className="post-actions">
+      <div className="hv-blurt-actions">
         <BuzzButton targetKind="blurt" targetId={blurt.id} count={blurt.buzz_count} />
         <StrikeButton targetKind="blurt" targetId={blurt.id} />
         <SparkButton targetKind="blurt" targetId={blurt.id} count={blurt.spark_count} />
-        <button
-          type="button"
-          onClick={() => setShowChimes((v) => !v)}
-          className="feed-btn is-sm is-quiet"
-        >
+        <button type="button" onClick={() => setShowChimes((v) => !v)} className="feed-btn is-sm is-quiet">
           <span className="feed-btn-icon" aria-hidden="true">🔔</span>
           <span>{blurt.chime_count}</span>
         </button>
@@ -110,15 +107,18 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
             onClick={handleLinger}
             disabled={busy}
             title="Stop the 24h countdown and keep this Blurt on your Space forever"
-            className="feed-btn is-sm"
-            style={{ marginLeft: "auto" }}
+            className="feed-btn is-sm hv-blurt-linger-btn"
           >
             {busy ? "Lingering…" : "Let it linger"}
           </button>
         )}
       </div>
 
-      {showChimes && <Chime targetKind="blurt" targetId={blurt.id} />}
+      {showChimes && (
+        <div className="hv-chime-slot">
+          <Chime targetKind="blurt" targetId={blurt.id} />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,840 @@
+/* =========================================================================
+   HAVEN — Feed redesign
+   Extends the existing cherry-blossom design system (Shippori Mincho /
+   Zen Kaku Gothic New, --cherry family) with three distinct sub-identities:
+
+     Flash  → ember/cherry, bright + immediate, gallery of light
+     Blurt  → ink/plum, quiet + literary, a column of paper fragments
+     Vault  → bronze/gold, ceremonial, a chamber of sealed dials
+
+   All three still breathe through the same thread: soft glass, cherry
+   glows, falling-petal motion, Shippori Mincho display type.
+   ========================================================================= */
+
+.hv-feed {
+  --gold: #B8863B;
+  --gold-bright: #E7BD6C;
+  --gold-soft: rgba(184, 134, 59, 0.10);
+  --gold-line: rgba(184, 134, 59, 0.28);
+
+  --plum: #7B3B54;
+  --plum-bright: #A85777;
+  --plum-soft: rgba(123, 59, 84, 0.07);
+  --plum-line: rgba(123, 59, 84, 0.18);
+
+  --ember-soft: rgba(255, 59, 92, 0.10);
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-strong: rgba(255, 255, 255, 0.82);
+  --hairline: rgba(196, 24, 60, 0.12);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+}
+
+.hv-feed * { box-sizing: border-box; }
+
+/* ---------- TOOLBAR ---------- */
+.hv-toolbar {
+  position: sticky;
+  top: -1px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: var(--glass);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 8px 30px -18px rgba(122, 15, 38, 0.35);
+  animation: hv-rise 0.6s var(--ease-out) both;
+}
+
+.hv-pulse-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hv-pulse {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 7px 13px 7px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--hairline);
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  letter-spacing: 0.01em;
+}
+.hv-pulse::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--cherry-bright);
+  box-shadow: 0 0 0 3px var(--ember-soft);
+}
+.hv-pulse.is-live::before { animation: hv-dot-pulse 1.8s ease-in-out infinite; }
+.hv-pulse.is-gold::before { background: var(--gold-bright); box-shadow: 0 0 0 3px var(--gold-soft); }
+.hv-pulse strong {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.hv-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(196, 24, 60, 0.045);
+}
+
+.hv-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  transition: color 0.3s var(--ease), background 0.3s var(--ease), transform 0.2s var(--ease);
+}
+.hv-tab:hover { color: var(--ink); transform: translateY(-1px); }
+.hv-tab .hv-tab-icon { font-size: 13px; line-height: 1; }
+.hv-tab .hv-tab-count {
+  font-size: 10.5px;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.hv-tab.is-active {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 4px 14px -6px rgba(122, 15, 38, 0.28);
+}
+.hv-tab.is-active[data-kind="flash"] { color: var(--cherry-deep); }
+.hv-tab.is-active[data-kind="blurt"] { color: var(--plum); }
+.hv-tab.is-active[data-kind="vault"] { color: var(--gold); }
+.hv-tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+/* ---------- VAULT SHELF (horizontal, shown above every non-vault view) ---------- */
+.hv-shelf {
+  animation: hv-rise 0.6s 0.05s var(--ease-out) both;
+}
+.hv-shelf-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.hv-shelf-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+}
+.hv-shelf-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-line), transparent);
+}
+.hv-shelf-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 4px 14px;
+  scroll-snap-type: x proximity;
+}
+.hv-shelf-track::-webkit-scrollbar { height: 5px; }
+.hv-shelf-track::-webkit-scrollbar-thumb { background: var(--gold-line); border-radius: 999px; }
+.hv-shelf-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* ---------- SHARED: empty state ---------- */
+.hv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 70px 24px;
+  border-radius: 24px;
+  border: 1px dashed var(--hairline);
+  background: radial-gradient(circle at 50% 0%, rgba(255, 59, 92, 0.05), transparent 70%);
+  color: var(--ink-muted);
+  font-size: 13.5px;
+  animation: hv-rise 0.5s var(--ease-out) both;
+}
+.hv-empty-icon {
+  font-size: 30px;
+  animation: hv-float 4.5s ease-in-out infinite;
+}
+.hv-empty-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* =========================================================================
+   ALL VIEW — the woven thread
+   ========================================================================= */
+.hv-thread {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-left: 26px;
+}
+.hv-thread-line {
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--cherry-bright) 0%, var(--hairline) 55%, transparent 100%);
+  opacity: 0.5;
+}
+.hv-thread-row {
+  position: relative;
+  opacity: 0;
+  animation: hv-item-in 0.6s var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+.hv-thread-node {
+  position: absolute;
+  left: -25px;
+  top: 22px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--cherry-bright);
+  box-shadow: 0 0 0 4px var(--white-soft);
+}
+.hv-thread-row.hv-thread-blurt .hv-thread-node { border-color: var(--plum-bright); }
+
+/* =========================================================================
+   FLASH GALLERY
+   ========================================================================= */
+.hv-flash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+.hv-flash-grid-item {
+  opacity: 0;
+  animation: hv-item-in 0.6s var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+
+/* =========================================================================
+   BLURT COLUMN
+   ========================================================================= */
+.hv-blurt-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.hv-blurt-column-item {
+  width: 100%;
+  max-width: 560px;
+  opacity: 0;
+  animation: hv-item-in 0.6s var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+
+/* =========================================================================
+   VAULT GRID
+   ========================================================================= */
+.hv-vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
+}
+
+/* =========================================================================
+   FLASH CARD
+   ========================================================================= */
+.hv-flash-card {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--ink);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 18px 40px -24px rgba(28, 19, 16, 0.55);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+.hv-flash-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 50px -22px rgba(28, 19, 16, 0.6);
+}
+.hv-flash-card.is-fallen { filter: grayscale(0.8) brightness(0.75); }
+.hv-flash-card.is-falling { animation: hv-post-fall 1s var(--ease) forwards; }
+.hv-flash-card.is-last-minute { animation: hv-flicker 1.1s ease-in-out infinite; }
+
+.hv-flash-life {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2.5px;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.18);
+}
+.hv-flash-life-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-bright), var(--cherry-bright));
+  transition: width 1s linear;
+}
+.hv-flash-life-fill.dying { background: linear-gradient(90deg, var(--cherry-bright), var(--cherry-deep)); }
+.hv-flash-life-fill.last-minute { animation: hv-shimmer 0.8s ease-in-out infinite; }
+
+.hv-flash-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  overflow: hidden;
+  background: #100a09;
+}
+.hv-flash-media img,
+.hv-flash-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s var(--ease-out);
+}
+.hv-flash-card:hover .hv-flash-media img,
+.hv-flash-card:hover .hv-flash-media video { transform: scale(1.045); }
+
+.hv-flash-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 22%, transparent 62%, rgba(15,8,7,0.86) 100%);
+  pointer-events: none;
+}
+
+.hv-flash-header {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 2;
+}
+.hv-flash-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  background: rgba(20, 12, 11, 0.4);
+  backdrop-filter: blur(6px);
+}
+.hv-flash-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.4);
+  flex: 0 0 auto;
+}
+.hv-flash-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hv-flash-username {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.01em;
+}
+.hv-flash-life-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(20, 12, 11, 0.4);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
+  color: var(--white);
+  white-space: nowrap;
+}
+.hv-flash-life-badge .hv-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--cherry-bright);
+  animation: hv-dot-pulse 1.6s ease-in-out infinite;
+}
+.hv-flash-life-badge.is-fallen .hv-dot { display: none; }
+
+.hv-flash-kind {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+
+.hv-flash-caption {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 54px;
+  z-index: 2;
+  color: var(--white);
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+}
+
+.hv-flash-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 12px;
+}
+
+/* =========================================================================
+   BLURT CARD — literary fragment
+   ========================================================================= */
+.hv-blurt-card {
+  position: relative;
+  border-radius: 20px;
+  padding: 22px 24px 16px;
+  background: linear-gradient(165deg, var(--white) 0%, var(--white-soft) 100%);
+  border: 1px solid var(--plum-line);
+  box-shadow: 0 14px 34px -26px rgba(122, 15, 38, 0.4);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+.hv-blurt-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -24px rgba(122, 15, 38, 0.45); }
+.hv-blurt-card.is-fallen { opacity: 0.55; filter: grayscale(0.5); }
+.hv-blurt-card.is-falling { animation: hv-post-fall 1s var(--ease) forwards; }
+.hv-blurt-card.is-last-minute { animation: hv-flicker 1.1s ease-in-out infinite; }
+.hv-blurt-card.is-dying { border-color: rgba(196,24,60,0.3); }
+
+.hv-blurt-mark {
+  position: absolute;
+  top: 2px;
+  left: 18px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 52px;
+  line-height: 1;
+  color: var(--plum-line);
+  user-select: none;
+}
+
+.hv-blurt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.hv-blurt-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hv-blurt-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--plum-line);
+}
+.hv-blurt-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hv-blurt-username {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.hv-blurt-meta { display: inline-flex; align-items: center; gap: 8px; }
+.hv-blurt-linger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(70, 130, 90, 0.1);
+  color: #3f7a52;
+  font-size: 11px;
+  font-weight: 500;
+}
+.hv-blurt-life {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--plum);
+  font-variant-numeric: tabular-nums;
+}
+.hv-blurt-life.is-fallen { color: var(--ink-muted); }
+.hv-blurt-life .hv-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--plum-bright); animation: hv-dot-pulse 1.8s ease-in-out infinite; }
+
+.hv-blurt-body {
+  position: relative;
+  z-index: 1;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 17.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0 0 16px;
+  padding-left: 4px;
+}
+
+.hv-blurt-life-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--plum-soft);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.hv-blurt-life-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--plum-bright), var(--cherry-bright));
+  transition: width 1s linear;
+}
+.hv-blurt-life-fill.dying { background: linear-gradient(90deg, var(--cherry-bright), var(--cherry-deep)); }
+.hv-blurt-life-fill.last-minute { animation: hv-shimmer 0.8s ease-in-out infinite; }
+
+.hv-blurt-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--plum-soft);
+}
+.hv-blurt-linger-btn {
+  margin-left: auto;
+}
+
+/* =========================================================================
+   SHARED KIND TAG
+   ========================================================================= */
+.hv-kind-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.hv-kind-tag.is-flash { background: rgba(20, 12, 11, 0.4); backdrop-filter: blur(6px); color: var(--white); }
+.hv-kind-tag.is-blurt { background: var(--plum-soft); color: var(--plum); }
+.hv-kind-tag.is-vault { background: var(--gold-soft); color: var(--gold); }
+
+/* =========================================================================
+   VAULT CARD — ceremonial dial, reskinned in bronze/gold glass
+   ========================================================================= */
+.hv-vault-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 26px 20px 20px;
+  border-radius: 24px;
+  background: linear-gradient(165deg, rgba(255,255,255,0.9), rgba(255,251,246,0.85));
+  border: 1px solid var(--gold-line);
+  box-shadow: 0 18px 40px -26px rgba(90, 60, 10, 0.35);
+  overflow: hidden;
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+.hv-vault-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% -10%, var(--gold-soft), transparent 60%);
+  pointer-events: none;
+}
+.hv-vault-card:hover { transform: translateY(-4px); box-shadow: 0 26px 52px -24px rgba(90, 60, 10, 0.4); }
+.hv-vault-card.is-compact { padding: 18px 16px 16px; gap: 10px; width: 190px; }
+.hv-vault-card.is-opening { animation: hv-vault-flash 1.4s ease-in-out infinite; }
+
+.hv-vault-rivet {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold-line);
+}
+.hv-vault-rivet.tl { top: 10px; left: 10px; }
+.hv-vault-rivet.tr { top: 10px; right: 10px; }
+.hv-vault-rivet.bl { bottom: 10px; left: 10px; }
+.hv-vault-rivet.br { bottom: 10px; right: 10px; }
+
+.hv-vault-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 24px; height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--gold-line);
+  background: rgba(255,255,255,0.7);
+  color: var(--gold);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), background 0.25s var(--ease);
+}
+.hv-vault-card:hover .hv-vault-close { opacity: 1; transform: scale(1); }
+.hv-vault-close:hover { background: var(--gold-soft); }
+.hv-vault-close svg { width: 11px; height: 11px; }
+
+.hv-vault-dial-wrap {
+  position: relative;
+  z-index: 1;
+  width: 128px;
+  height: 128px;
+}
+.hv-vault-card.is-compact .hv-vault-dial-wrap { width: 96px; height: 96px; }
+
+.hv-vault-dial-glow {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-soft) 0%, transparent 70%);
+  animation: hv-vault-breathe 3.6s ease-in-out infinite;
+}
+
+.hv-vault-dial { width: 100%; height: 100%; position: relative; z-index: 1; }
+.hv-vault-dial-face { fill: var(--white-soft); stroke: var(--gold-line); stroke-width: 1; }
+.hv-vault-dial-ticks line { stroke: var(--gold-line); }
+.hv-vault-dial-ring-track { stroke: rgba(184, 134, 59, 0.14); }
+.hv-vault-dial-ring-fill { stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.hv-vault-wheel-hub { fill: var(--white); stroke: var(--gold-line); stroke-width: 1; }
+.hv-vault-wheel-spoke { fill: var(--gold); opacity: 0.55; }
+.hv-vault-wheel-center { fill: var(--gold); }
+.hv-vault-card.is-opening .hv-vault-dial-wheel { animation: hv-vault-spin 2.4s linear infinite; transform-origin: 50px 50px; }
+
+.hv-vault-spark-burst { position: absolute; inset: 0; }
+.hv-vault-spark {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 3px; height: 10px;
+  border-radius: 2px;
+  background: var(--gold-bright);
+  transform-origin: 50% 44px;
+  transform: translate(-50%, -50%) rotate(var(--sa)) translateY(-44px);
+  animation: hv-vault-spark-fly 0.9s var(--ease-out) forwards;
+}
+
+.hv-vault-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 1;
+}
+.hv-vault-stamp {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+.hv-vault-meta {
+  font-size: 10.5px;
+  color: var(--ink-muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(184,134,59,0.08);
+}
+
+.hv-vault-digits {
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.hv-vault-digit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.hv-vault-digit-value {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.hv-vault-digit-label {
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.hv-vault-digit-sep {
+  font-size: 15px;
+  color: var(--gold-line);
+  transform: translateY(-4px);
+  animation: hv-vault-colon-blink 1.4s ease-in-out infinite;
+}
+
+.hv-vault-opening-text {
+  z-index: 1;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  color: var(--cherry);
+}
+
+.hv-vault-caption {
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  max-width: 22ch;
+}
+
+/* =========================================================================
+   Reaction / action buttons — scoped upgrade, doesn't touch the base
+   .feed-btn rules used elsewhere in the app (Den, Ping, Composer)
+   ========================================================================= */
+.hv-feed .feed-btn {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(196, 24, 60, 0.05);
+  color: var(--ink-muted);
+  padding: 6px 11px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.25s var(--ease-out), background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.hv-feed .feed-btn:hover { background: rgba(196, 24, 60, 0.1); color: var(--ink); transform: translateY(-1px); }
+.hv-feed .feed-btn:active { transform: translateY(0) scale(0.96); }
+.hv-feed .feed-btn.is-solid { background: var(--cherry); color: var(--white); }
+.hv-feed .feed-btn.is-solid:hover { background: var(--cherry-deep); }
+.hv-feed .feed-btn.is-quiet { background: transparent; }
+.hv-feed .feed-btn.is-popping { animation: hv-reaction-pop 0.4s var(--ease-out); }
+
+.hv-flash-card .hv-flash-actions .feed-btn { background: rgba(255,255,255,0.12); color: var(--white); }
+.hv-flash-card .hv-flash-actions .feed-btn:hover { background: rgba(255,255,255,0.22); color: var(--white); }
+.hv-flash-card .hv-flash-actions .feed-btn.is-solid { background: var(--cherry-bright); }
+
+.hv-chime-slot { margin-top: 12px; }
+.hv-chime-slot .chime-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--hairline);
+  animation: hv-rise 0.35s var(--ease-out) both;
+}
+.hv-chime-slot .chime-row {
+  display: flex;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.hv-chime-slot .chime-author { font-weight: 600; color: var(--cherry-deep); flex: 0 0 auto; }
+.hv-chime-slot .chime-body { color: var(--ink); }
+.hv-chime-slot .chime-empty { font-size: 12px; color: var(--ink-muted); font-style: italic; }
+.hv-chime-slot .feed-input {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: var(--white-soft);
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  color: var(--ink);
+}
+.hv-chime-slot .feed-input:focus { outline: none; border-color: var(--cherry); }
+
+/* Flash cards sit on a dark media background — the chime panel underneath
+   needs a light-on-dark palette instead of the default ink-on-white one. */
+.hv-flash-card .hv-chime-slot .chime-panel { border-top-color: rgba(255,255,255,0.16); }
+.hv-flash-card .hv-chime-slot .chime-author { color: var(--cherry-bright); }
+.hv-flash-card .hv-chime-slot .chime-body { color: rgba(255,255,255,0.88); }
+.hv-flash-card .hv-chime-slot .chime-empty { color: rgba(255,255,255,0.55); }
+.hv-flash-card .hv-chime-slot .feed-input {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+  color: var(--white);
+}
+.hv-flash-card .hv-chime-slot .feed-input::placeholder { color: rgba(255,255,255,0.45); }
+
+/* =========================================================================
+   MOTION
+   ========================================================================= */
+@keyframes hv-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hv-item-in { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes hv-dot-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.4); } }
+@keyframes hv-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes hv-shimmer { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@keyframes hv-flicker { 0%, 100% { opacity: 1; } 45% { opacity: 0.75; } 55% { opacity: 0.92; } }
+@keyframes hv-post-fall { to { opacity: 0; transform: translateY(26px) rotate(2deg) scale(0.96); } }
+@keyframes hv-vault-breathe { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes hv-vault-spin { to { transform: rotate(360deg); } }
+@keyframes hv-vault-colon-blink { 50% { opacity: 0.25; } }
+@keyframes hv-vault-flash { 0%, 100% { box-shadow: 0 18px 40px -26px rgba(90, 60, 10, 0.35); } 50% { box-shadow: 0 0 46px -6px var(--gold-bright); } }
+@keyframes hv-vault-spark-fly {
+  from { opacity: 1; transform: translate(-50%, -50%) rotate(var(--sa)) translateY(-44px) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -50%) rotate(var(--sa)) translateY(-78px) scale(0.3); }
+}
+@keyframes hv-reaction-pop { 0% { transform: scale(1); } 40% { transform: scale(1.22); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hv-feed * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 720px) {
+  .hv-toolbar { flex-direction: column; align-items: stretch; }
+  .hv-tabs { justify-content: space-between; }
+  .hv-thread { padding-left: 20px; }
+  .hv-flash-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}

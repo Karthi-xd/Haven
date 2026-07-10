@@ -5,6 +5,7 @@ import BuzzButton from "./Buzz";
 import StrikeButton from "./Strike";
 import SparkButton from "./Spark";
 import Chime from "./Chime";
+import "./Feed.css";
 
 interface FlashProps {
   flash: FlashType;
@@ -13,7 +14,7 @@ interface FlashProps {
   onFallen?: (id: string) => void;
 }
 
-/** A single Flash — public by default, falls 24h after it's posted. */
+/** A single Flash — public by default, full-bleed media that falls 24h after it's posted. */
 export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps) {
   const [showChimes, setShowChimes] = useState(false);
   const life = useLifespan(flash.posted_at, flash.expires_at ?? null, flash.fallen);
@@ -31,8 +32,7 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
 
   const fallen = flash.fallen || life.expired;
   const cardClass = [
-    "post-card",
-    "post-flash",
+    "hv-flash-card",
     justFell ? "is-falling" : fallen ? "is-fallen" : life.isLastMinute ? "is-last-minute" : life.isDying ? "is-dying" : "",
   ]
     .filter(Boolean)
@@ -41,50 +41,48 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
   return (
     <div className={cardClass}>
       {!fallen && (
-        <div className="life-bar-track">
+        <div className="hv-flash-life">
           <div
-            className={`life-bar-fill${life.isLastMinute ? " last-minute" : life.isDying ? " dying" : ""}`}
+            className={`hv-flash-life-fill${life.isLastMinute ? " last-minute" : life.isDying ? " dying" : ""}`}
             style={{ width: `${Math.max(2, (1 - life.lifeFraction) * 100)}%` }}
           />
         </div>
       )}
 
-      {showAuthor && (
-        <div className="post-header">
-          <div className="post-author-group">
-            <span className="post-avatar" aria-hidden="true">
-              <img src={flash.author.avatar_url} alt="" />
-            </span>
-            <span className="post-author">@{flash.author.username}</span>
-          </div>
-          <div className="post-header-right">
-            <span className="kind-tag is-flash">
-              <span aria-hidden="true">⚡</span>Flash
-            </span>
-            <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
-              {!fallen && <span className="dot" aria-hidden="true" />}
-              {fallen ? "fallen" : life.label}
-              {flash.followers_only ? " · followers only" : ""}
-            </span>
-          </div>
-        </div>
-      )}
-
-      <div className="flash-media-wrap">
+      <div className="hv-flash-media">
         {flash.media_kind === "video" ? (
           <video src={flash.media_url} controls />
         ) : (
           <img src={flash.media_url} alt={flash.caption} />
         )}
-        {!showAuthor && (
-          <span className="kind-tag is-flash flash-media-kindtag">
-            <span aria-hidden="true">⚡</span>Flash
+        <span className="hv-flash-scrim" aria-hidden="true" />
+
+        {showAuthor ? (
+          <div className="hv-flash-header">
+            <span className="hv-flash-author">
+              <span className="hv-flash-avatar" aria-hidden="true">
+                <img src={flash.author.avatar_url} alt="" />
+              </span>
+              <span className="hv-flash-username">@{flash.author.username}</span>
+            </span>
+            <span className={`hv-flash-life-badge${fallen ? " is-fallen" : ""}`}>
+              <span className="hv-dot" aria-hidden="true" />
+              {fallen ? "fallen" : life.label}
+              {flash.followers_only ? " · followers" : ""}
+            </span>
+          </div>
+        ) : (
+          <span className="hv-flash-kind">
+            <span className="hv-kind-tag is-flash">
+              <span aria-hidden="true">⚡</span>Flash
+            </span>
           </span>
         )}
-        {flash.caption && <p className="flash-caption-overlay">{flash.caption}</p>}
+
+        {flash.caption && <p className="hv-flash-caption">{flash.caption}</p>}
       </div>
 
-      <div className="post-actions">
+      <div className="hv-flash-actions">
         <BuzzButton targetKind="flash" targetId={flash.id} count={flash.buzz_count} />
         <StrikeButton targetKind="flash" targetId={flash.id} />
         <SparkButton targetKind="flash" targetId={flash.id} count={flash.spark_count} />
@@ -95,12 +93,12 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
           style={{ marginLeft: "auto" }}
         >
           <span className="feed-btn-icon" aria-hidden="true">🔔</span>
-          <span>{flash.chime_count} Chimes</span>
+          <span>{flash.chime_count}</span>
         </button>
       </div>
 
       {showChimes && (
-        <div style={{ padding: "0 16px 16px" }}>
+        <div className="hv-chime-slot" style={{ padding: "0 12px 12px" }}>
           <Chime targetKind="flash" targetId={flash.id} />
         </div>
       )}
