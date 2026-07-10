@@ -6,6 +6,8 @@ import { useCountdown } from "../hooks/useLifespan";
 interface VaultProps {
   vault: VaultType;
   onDeleted?: (id: string) => void;
+  /** Smaller footprint for the horizontal "Sealed Vaults" shelf in the feed. */
+  compact?: boolean;
 }
 
 const RING_R = 42;
@@ -38,7 +40,7 @@ function pad2(n: number) {
 }
 
 /** A sealed Vault — hidden from everyone until its unlock time, then it opens into a Flash. */
-export default function Vault({ vault, onDeleted }: VaultProps) {
+export default function Vault({ vault, onDeleted, compact = false }: VaultProps) {
   const { reached, fraction, remainingMs } = useCountdown(vault.unlocks_at, vault.created_at);
 
   const { days, hours, mins, secs } = useMemo(() => {
@@ -60,7 +62,7 @@ export default function Vault({ vault, onDeleted }: VaultProps) {
   }
 
   return (
-    <div className={`vault-card${reached ? " is-opening" : ""}`}>
+    <div className={`vault-card${reached ? " is-opening" : ""}${compact ? " is-compact" : ""}`}>
       <span className="vault-rivet tl" aria-hidden="true" />
       <span className="vault-rivet tr" aria-hidden="true" />
       <span className="vault-rivet bl" aria-hidden="true" />
@@ -122,8 +124,13 @@ export default function Vault({ vault, onDeleted }: VaultProps) {
       </div>
 
       <div className="vault-status-row">
+        <span className="kind-tag is-vault">
+          <span aria-hidden="true">🔒</span>Vault
+        </span>
         <span className="vault-status-stamp">{reached ? "Opening" : "Sealed"}</span>
-        <span className="vault-meta-tag">{vault.followers_only ? "Followers only" : "Opens publicly"}</span>
+        {!compact && (
+          <span className="vault-meta-tag">{vault.followers_only ? "Followers only" : "Opens publicly"}</span>
+        )}
       </div>
 
       {!reached ? (
