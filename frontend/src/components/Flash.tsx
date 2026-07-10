@@ -57,11 +57,16 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
             </span>
             <span className="post-author">@{flash.author.username}</span>
           </div>
-          <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
-            {!fallen && <span className="dot" aria-hidden="true" />}
-            {fallen ? "fallen" : life.label}
-            {flash.followers_only ? " · followers only" : ""}
-          </span>
+          <div className="post-header-right">
+            <span className="kind-tag is-flash">
+              <span aria-hidden="true">⚡</span>Flash
+            </span>
+            <span className={`life-badge${fallen ? "" : life.isDying ? " dying" : ""}`} style={{ color: fallen ? "var(--ink-muted)" : "var(--cherry)" }}>
+              {!fallen && <span className="dot" aria-hidden="true" />}
+              {fallen ? "fallen" : life.label}
+              {flash.followers_only ? " · followers only" : ""}
+            </span>
+          </div>
         </div>
       )}
 
@@ -70,6 +75,11 @@ export default function Flash({ flash, showAuthor = true, onFallen }: FlashProps
           <video src={flash.media_url} controls />
         ) : (
           <img src={flash.media_url} alt={flash.caption} />
+        )}
+        {!showAuthor && (
+          <span className="kind-tag is-flash flash-media-kindtag">
+            <span aria-hidden="true">⚡</span>Flash
+          </span>
         )}
         {flash.caption && <p className="flash-caption-overlay">{flash.caption}</p>}
       </div>
