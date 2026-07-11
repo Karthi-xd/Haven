@@ -9,6 +9,7 @@ import SpaceGrid from "./SpaceGrid";
 import Trail from "./Trail";
 import Den from "./Den";
 import ProfileSettings from "./ProfileSettings";
+import HomeHub from "./HomeHub";
 
 interface SpaceProps {
   onLogout: () => void;
@@ -46,6 +47,17 @@ export default function Space({ onLogout }: SpaceProps) {
   function refreshMine() {
     if (!profile) return;
     fetchSpaceBlurts(profile.id).then(setMyBlurts);
+  }
+
+  function handleBlurtCreated(newBlurt: BlurtType) {
+    setFeedBlurts((prev) => [newBlurt, ...prev]);
+    if (profile && newBlurt.author?.id === profile.id) {
+      setMyBlurts((prev) => [newBlurt, ...prev]);
+    }
+  }
+
+  function handleBlurtFallen(id: string) {
+    setFeedBlurts((prev) => prev.filter((b) => b.id !== id));
   }
 
   if (loading) return <LoadingScene />;
@@ -187,21 +199,16 @@ export default function Space({ onLogout }: SpaceProps) {
       {/* MAIN CONTENT */}
       <main style={{ padding: "40px 60px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 24 }}>
         {tab === "home" && (
-          <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            <div>
-              <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 32, margin: "0 0 6px", color: "var(--ink)" }}>
-                Welcome back, {displayName}
-              </h1>
-              <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
-                Here's what's new across Haven right now.
-              </p>
-            </div>
-
-            {feedBlurts.map((b) => (
-              <div key={b.id} className="space-card" style={{ padding: 16 }}>
-                <p style={{ margin: 0 }}>@{b.author.username}: {b.body}</p>
-              </div>
-            ))}
+          <div className="haven-panel-in">
+            <HomeHub
+              profile={profile}
+              displayName={displayName}
+              feedBlurts={feedBlurts}
+              myBlurts={myBlurts}
+              counts={counts}
+              onBlurtCreated={handleBlurtCreated}
+              onFallen={handleBlurtFallen}
+            />
           </div>
         )}
 

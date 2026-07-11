@@ -25,6 +25,29 @@ export interface Blurt {
   chime_count: number;
 }
 
+/** A quick, media-first burst that lives for a short window — the "story" layer of Haven. */
+export interface Flash {
+  id: string;
+  author: Profile;
+  media_url: string;
+  caption: string;
+  posted_at: string;
+  expires_at: string | null;
+  seen_count: number;
+  spark_count: number;
+}
+
+/** A saved, permanent piece a user chooses to keep forever in their Space. */
+export interface Vault {
+  id: string;
+  author: Profile;
+  title: string;
+  body: string;
+  cover_url: string | null;
+  saved_at: string;
+  buzz_count: number;
+}
+
 export type ReactableKind = "blurt";
 
 /** Lightweight positive reaction (was "like/upvote"). */
