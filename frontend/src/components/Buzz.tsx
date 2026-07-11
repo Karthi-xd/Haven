@@ -10,6 +10,7 @@ interface BuzzProps {
 }
 
 export default function Buzz({ targetKind, targetId, count: initialCount, active: initialActive = false }: BuzzProps) {
+  void targetKind;
   const [active, setActive] = useState(initialActive);
   const [count, setCount] = useState(initialCount);
   const [busy, setBusy] = useState(false);
@@ -40,9 +41,9 @@ export default function Buzz({ targetKind, targetId, count: initialCount, active
       onClick={handleClick}
       aria-pressed={active}
       title="Buzz"
-      className={`feed-btn is-sm${active ? " is-solid" : ""}${pop ? " is-popping" : ""}`}
+      className={`btn is-sm${active ? " is-solid" : ""}${pop ? " is-popping" : ""}`}
     >
-      <span className="feed-btn-icon" aria-hidden="true">{active ? "🌸" : "🤍"}</span>
+      <span className="btn-icon" aria-hidden="true">{active ? "🌸" : "🤍"}</span>
       <span>{count}</span>
     </button>
   );

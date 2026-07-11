@@ -7,7 +7,7 @@ interface ChimeProps {
   targetId: string;
 }
 
-/** The comment thread growing off a single Flash or Blurt. */
+/** The comment thread growing off a single Blurt. */
 export default function Chime({ targetKind, targetId }: ChimeProps) {
   const [chimes, setChimes] = useState<ChimeType[]>([]);
   const [body, setBody] = useState("");
@@ -55,9 +55,9 @@ export default function Chime({ targetKind, targetId }: ChimeProps) {
           onChange={(e) => setBody(e.target.value)}
           placeholder="Add a Chime…"
           maxLength={280}
-          className="feed-input"
+          className="chime-input"
         />
-        <button type="submit" disabled={posting || !body.trim()} className="feed-btn is-solid is-sm">
+        <button type="submit" disabled={posting || !body.trim()} className="btn is-solid is-sm">
           Chime
         </button>
       </form>

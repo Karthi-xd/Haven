@@ -10,6 +10,7 @@ interface StrikeProps {
 
 /** The negative counterpart to a Buzz — quiet, not punitive. No public count shown. */
 export default function Strike({ targetKind, targetId, active: initialActive = false }: StrikeProps) {
+  void targetKind;
   const [active, setActive] = useState(initialActive);
   const [busy, setBusy] = useState(false);
 
@@ -33,10 +34,10 @@ export default function Strike({ targetKind, targetId, active: initialActive = f
       onClick={handleClick}
       aria-pressed={active}
       title="Strike"
-      className={`feed-btn is-sm is-quiet${active ? " is-active-strike" : ""}`}
+      className={`btn is-sm is-quiet${active ? " is-active-strike" : ""}`}
       style={{ opacity: active ? 1 : 0.75 }}
     >
-      <span className="feed-btn-icon" aria-hidden="true">{active ? "🥀" : "🍂"}</span>
+      <span className="btn-icon" aria-hidden="true">{active ? "🥀" : "🍂"}</span>
     </button>
   );
 }

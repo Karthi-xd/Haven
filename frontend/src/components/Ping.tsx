@@ -24,10 +24,10 @@ export default function Ping({ ping, onApprove, onDecline }: PingProps) {
         <div className="ping-message">{ping.opening_message}</div>
       </div>
       <div className="ping-actions">
-        <button type="button" onClick={() => onApprove(ping.id)} className="feed-btn is-solid is-sm">
+        <button type="button" onClick={() => onApprove(ping.id)} className="btn is-solid is-sm">
           Open the Den
         </button>
-        <button type="button" onClick={() => onDecline(ping.id)} className="feed-btn is-sm is-quiet">
+        <button type="button" onClick={() => onDecline(ping.id)} className="btn is-sm is-quiet">
           Decline
         </button>
       </div>

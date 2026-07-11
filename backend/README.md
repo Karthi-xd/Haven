@@ -30,7 +30,7 @@ haven-backend/
 └── apps/
     ├── users/               # custom User model, register/login (JWT), profile
     ├── communities/         # Community + Membership ("subreddits")
-    ├── posts/                # Post model + feed endpoints
+    ├── posts/                # Post model + endpoints
     ├── comments/             # threaded Comment model
     └── votes/                # generic up/down vote on posts or comments
 ```
@@ -46,7 +46,7 @@ haven-backend/
 | `GET /api/auth/<username>/` | public profile |
 | `GET/POST /api/communities/` | list/create communities |
 | `GET/PATCH/DELETE /api/communities/<slug>/` | community detail |
-| `GET/POST /api/posts/?community__slug=<slug>&ordering=-score` | feed, filterable/sortable |
+| `GET/POST /api/posts/?community__slug=<slug>&ordering=-score` | filterable/sortable |
 | `GET/POST /api/comments/?post=<id>` | threaded comments (use `parent` for replies) |
 | `POST /api/votes/` | body: `{ "target_type": "post", "target_id": "...", "value": 1 }` |
 

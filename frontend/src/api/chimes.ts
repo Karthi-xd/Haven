@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabaseClient";
 import type { ReactableKind, Chime } from "../types";
 
-/** Fetch every Chime (comment) growing off a Flash or Blurt, oldest first. */
+/** Fetch every Chime (comment) growing off a Blurt, oldest first. */
 export async function fetchChimes(targetKind: ReactableKind, targetId: string) {
   const { data, error } = await supabase
     .from("sprouts")

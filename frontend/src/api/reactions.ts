@@ -9,7 +9,7 @@ async function currentUserId() {
   return user.id;
 }
 
-/** Toggle a lightweight positive Buzz on a Flash or Blurt. */
+/** Toggle a lightweight positive Buzz on a Blurt. */
 export async function toggleBuzz(targetKind: ReactableKind, targetId: string) {
   const userId = await currentUserId();
   const { data: existing } = await supabase
@@ -32,7 +32,7 @@ export async function toggleBuzz(targetKind: ReactableKind, targetId: string) {
   return { active: true };
 }
 
-/** Toggle a Strike (the negative reaction) on a Flash or Blurt. */
+/** Toggle a Strike (the negative reaction) on a Blurt. */
 export async function toggleStrike(targetKind: ReactableKind, targetId: string) {
   const userId = await currentUserId();
   const { data: existing } = await supabase
@@ -55,7 +55,7 @@ export async function toggleStrike(targetKind: ReactableKind, targetId: string) 
   return { active: true };
 }
 
-/** Toggle a Spark — the rare "this changed how I see things" reaction. */
+/** Toggle a Spark reaction. */
 export async function toggleSpark(targetKind: ReactableKind, targetId: string) {
   const userId = await currentUserId();
   const { data: existing } = await supabase

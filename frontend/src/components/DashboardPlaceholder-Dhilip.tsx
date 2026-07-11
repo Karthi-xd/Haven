@@ -123,7 +123,7 @@ export default function DashboardPlaceholder({ onLogout }: DashboardPlaceholderP
         </button>
       </aside>
 
-      {/* FEED CONTENT */}
+      {/* MAIN CONTENT */}
       <main style={{
         padding: '40px 60px',
         overflowY: 'auto',
@@ -140,11 +140,11 @@ export default function DashboardPlaceholder({ onLogout }: DashboardPlaceholderP
           </p>
         </div>
 
-        {/* FEED CARDS */}
+        {/* Static cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '640px', marginTop: '16px' }}>
           {[
             { community: "r/gardening", author: "sakura_lover", title: "My first cherry blossom tree is starting to bud! 🌸", body: "After three years of carefully pruning and tending to this young sapling, we are finally seeing the first tiny pink buds. Location: Zone 7b.", score: 48 },
-            { community: "r/coding", author: "explorer_42", title: "Why building standard-focused communities is the future", body: "Centralized algorithms reward outrage and fast clicks. True community feeds should prioritize chronological depth, moderation, and user ownership.", score: 32 }
+            { community: "r/coding", author: "explorer_42", title: "Why building standard-focused communities is the future", body: "Centralized algorithms reward outrage and fast clicks. True communities should prioritize depth and ownership.", score: 32 }
           ].map((post, idx) => (
             <div key={idx} style={{
               background: '#fff',

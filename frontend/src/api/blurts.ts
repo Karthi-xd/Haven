@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabaseClient";
 import type { Blurt } from "../types";
 
-export async function fetchBlurtFeed(limit = 30) {
+export async function fetchBlurts(limit = 30) {
   const { data, error } = await supabase
     .from("whispers_with_counts")
     .select("*")

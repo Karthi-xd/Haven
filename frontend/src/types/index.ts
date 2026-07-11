@@ -11,22 +11,6 @@ export interface Profile {
   created_at: string;
 }
 
-/** A photo/video post. Public by default, falls after 24h. */
-export interface Flash {
-  id: string;
-  author: Profile;
-  media_url: string;
-  media_kind: "image" | "video";
-  caption: string;
-  followers_only: boolean; // buried setting — default false (public)
-  posted_at: string;
-  expires_at: string;
-  fallen: boolean; // true once past expires_at
-  buzz_count: number;
-  spark_count: number;
-  chime_count: number;
-}
-
 /** A short text post. Falls in 24h unless `lingering` is set. */
 export interface Blurt {
   id: string;
@@ -41,21 +25,7 @@ export interface Blurt {
   chime_count: number;
 }
 
-/** A sealed, scheduled post. Hidden until unlocks_at, then behaves like a Flash. */
-export interface Vault {
-  id: string;
-  author: Profile;
-  media_url: string;
-  media_kind: "image" | "video";
-  caption: string;
-  followers_only: boolean;
-  sealed: boolean; // true until unlocks_at passes
-  unlocks_at: string;
-  unlocked_flash_id: string | null; // set once it opens into a live Flash
-  created_at: string;
-}
-
-export type ReactableKind = "flash" | "blurt";
+export type ReactableKind = "blurt";
 
 /** Lightweight positive reaction (was "like/upvote"). */
 export interface Buzz {
@@ -66,7 +36,7 @@ export interface Buzz {
   created_at: string;
 }
 
-/** Lightweight negative reaction (was "dislike/downvote"). Flashes wilt when this lands. */
+/** Lightweight negative reaction. */
 export interface Strike {
   id: string;
   user_id: string;
@@ -84,7 +54,7 @@ export interface Spark {
   created_at: string;
 }
 
-/** A reply/comment on a Flash or Blurt. */
+/** A reply/comment on a Blurt. */
 export interface Chime {
   id: string;
   target_kind: ReactableKind;
@@ -131,7 +101,7 @@ export interface Message {
 
 /** A single branch point in a user's Trail. */
 export interface TrailNode {
-  flash_id: string;
+  id: string;
   media_url: string;
   posted_at: string;
   alive: boolean; // true = still pulsing, false = frozen in place

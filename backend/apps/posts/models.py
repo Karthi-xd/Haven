@@ -19,7 +19,7 @@ class Post(models.Model):
     body = models.TextField(blank=True)
     url = models.URLField(blank=True)
     score = models.IntegerField(default=0)          # denormalized upvotes - downvotes
-    comment_count = models.IntegerField(default=0)  # denormalized for feed queries
+    comment_count = models.IntegerField(default=0)
     is_pinned = models.BooleanField(default=False)
     is_removed = models.BooleanField(default=False)  # moderation soft-delete
     created_at = models.DateTimeField(auto_now_add=True)

@@ -6,7 +6,7 @@ import BuzzButton from "./Buzz";
 import StrikeButton from "./Strike";
 import SparkButton from "./Spark";
 import Chime from "./Chime";
-import "./Feed.css";
+import "./Haven.css";
 
 interface BlurtProps {
   blurt: BlurtType;
@@ -96,8 +96,8 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
         <BuzzButton targetKind="blurt" targetId={blurt.id} count={blurt.buzz_count} />
         <StrikeButton targetKind="blurt" targetId={blurt.id} />
         <SparkButton targetKind="blurt" targetId={blurt.id} count={blurt.spark_count} />
-        <button type="button" onClick={() => setShowChimes((v) => !v)} className="feed-btn is-sm is-quiet">
-          <span className="feed-btn-icon" aria-hidden="true">🔔</span>
+        <button type="button" onClick={() => setShowChimes((v) => !v)} className="btn is-sm is-quiet">
+          <span className="btn-icon" aria-hidden="true">🔔</span>
           <span>{blurt.chime_count}</span>
         </button>
 
@@ -107,7 +107,7 @@ export default function Blurt({ blurt, isOwn = false, showAuthor = true, onFalle
             onClick={handleLinger}
             disabled={busy}
             title="Stop the 24h countdown and keep this Blurt on your Space forever"
-            className="feed-btn is-sm hv-blurt-linger-btn"
+            className="btn is-sm hv-blurt-linger-btn"
           >
             {busy ? "Lingering…" : "Let it linger"}
           </button>

@@ -30,7 +30,7 @@ function formatRemaining(ms: number): string {
 }
 
 /**
- * Ticks down the life of a Flash or Blurt toward its expires_at, giving back
+ * Ticks down the life of a Blurt toward its expires_at, giving back
  * everything the UI needs to visually "fade" a post as its 24h window closes.
  *
  * Pass `expiresAt = null` for a permanent (lingering) Blurt — it always comes
@@ -45,7 +45,7 @@ export function useLifespan(postedAt: string, expiresAt: string | null, alreadyF
 
   useEffect(() => {
     if (!expiresMs) return; // permanent — nothing to tick
-    // Tick every second so the last minute feels alive; cheap enough for a feed of cards.
+    // Tick every second so the last minute feels alive.
     const id = setInterval(() => setNow(Date.now()), SECOND);
     return () => clearInterval(id);
   }, [expiresMs]);
@@ -68,7 +68,7 @@ export function useLifespan(postedAt: string, expiresAt: string | null, alreadyF
   };
 }
 
-/** Simpler one-way countdown for a sealed Vault counting down to unlocks_at. */
+/** Simpler one-way countdown. */
 export function useCountdown(targetAt: string, startAt?: string) {
   const targetMs = useMemo(() => new Date(targetAt).getTime(), [targetAt]);
   const startMs = useMemo(() => (startAt ? new Date(startAt).getTime() : null), [startAt]);

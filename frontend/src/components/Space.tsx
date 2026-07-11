@@ -1,60 +1,43 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { fetchMe } from "../api/auth";
-import { fetchSpaceFlashes } from "../api/flashes";
-import { fetchSpaceBlurts } from "../api/blurts";
-import { fetchFlashFeed } from "../api/flashes";
-import { fetchBlurtFeed } from "../api/blurts";
-import { fetchMyVaults } from "../api/vaults";
+import { fetchSpaceBlurts, fetchBlurts } from "../api/blurts";
 import { fetchTendingCounts } from "../api/tending";
-import type { Profile, Flash as FlashType, Blurt as BlurtType, Vault as VaultType } from "../types";
+import type { Profile, Blurt as BlurtType } from "../types";
 import LoadingScene from "./LoadingScene";
 import Wake from "./Wake";
 import SpaceGrid from "./SpaceGrid";
 import Trail from "./Trail";
 import Den from "./Den";
-import Composer from "./Composer";
-import FlashCard from "./Flash";
-import VaultCard from "./Vault";
-import Feed from "./feed";
 import ProfileSettings from "./ProfileSettings";
 
 interface SpaceProps {
   onLogout: () => void;
 }
 
-type Tab = "feed" | "space" | "trail" | "den" | "settings";
+type Tab = "home" | "space" | "trail" | "den" | "settings";
 
 export default function Space({ onLogout }: SpaceProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>("feed");
+  const [tab, setTab] = useState<Tab>("home");
 
-  const [myFlashes, setMyFlashes] = useState<FlashType[]>([]);
   const [myBlurts, setMyBlurts] = useState<BlurtType[]>([]);
-  const [myVaults, setMyVaults] = useState<VaultType[]>([]);
-  const [feedFlashes, setFeedFlashes] = useState<FlashType[]>([]);
   const [feedBlurts, setFeedBlurts] = useState<BlurtType[]>([]);
   const [counts, setCounts] = useState({ tenders: 0, tended: 0 });
-  const [selectedFlash, setSelectedFlash] = useState<FlashType | null>(null);
 
   useEffect(() => {
     fetchMe()
       .then(async (me) => {
         setProfile(me);
         if (me) {
-          const [flashes, blurts, vaults, tendingCounts] = await Promise.all([
-            fetchSpaceFlashes(me.id),
+          const [blurts, tendingCounts] = await Promise.all([
             fetchSpaceBlurts(me.id),
-            fetchMyVaults(),
             fetchTendingCounts(me.id),
           ]);
-          setMyFlashes(flashes);
           setMyBlurts(blurts);
-          setMyVaults(vaults);
           setCounts(tendingCounts);
         }
-        const [fp, fw] = await Promise.all([fetchFlashFeed(), fetchBlurtFeed()]);
-        setFeedFlashes(fp);
+        const fw = await fetchBlurts();
         setFeedBlurts(fw);
       })
       .finally(() => setLoading(false));
@@ -62,9 +45,7 @@ export default function Space({ onLogout }: SpaceProps) {
 
   function refreshMine() {
     if (!profile) return;
-    fetchSpaceFlashes(profile.id).then(setMyFlashes);
     fetchSpaceBlurts(profile.id).then(setMyBlurts);
-    fetchMyVaults().then(setMyVaults);
   }
 
   if (loading) return <LoadingScene />;
@@ -74,7 +55,7 @@ export default function Space({ onLogout }: SpaceProps) {
   const avatar = profile?.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=haven";
 
   const NAV_ICONS: Record<Tab, ReactElement> = {
-    feed: (
+    home: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 10.5 12 3l9 7.5" />
         <path d="M5.5 9.5V20a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V9.5" />
@@ -185,9 +166,8 @@ export default function Space({ onLogout }: SpaceProps) {
             </div>
           </button>
 
-
           <nav className="space-nav">
-            {navItem("feed", "Feed")}
+            {navItem("home", "Home")}
             {navItem("space", "My Space")}
             {navItem("trail", "Trail")}
             {navItem("den", "Den")}
@@ -206,7 +186,7 @@ export default function Space({ onLogout }: SpaceProps) {
 
       {/* MAIN CONTENT */}
       <main style={{ padding: "40px 60px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 24 }}>
-        {tab === "feed" && (
+        {tab === "home" && (
           <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
               <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 32, margin: "0 0 6px", color: "var(--ink)" }}>
@@ -217,79 +197,26 @@ export default function Space({ onLogout }: SpaceProps) {
               </p>
             </div>
 
-            <Composer
-              onFlashCreated={(p) => { setMyFlashes((prev) => [p, ...prev]); setFeedFlashes((prev) => [p, ...prev]); }}
-              onBlurtCreated={(w) => { setMyBlurts((prev) => [w, ...prev]); setFeedBlurts((prev) => [w, ...prev]); }}
-              onVaultCreated={refreshMine}
-            />
-
-            <Feed
-              flashes={feedFlashes}
-              blurts={feedBlurts}
-              vaults={myVaults}
-              currentUserId={profile?.id}
-              onFlashFallen={(id) => setFeedFlashes((prev) => prev.filter((f) => f.id !== id))}
-              onBlurtFallen={(id) => setFeedBlurts((prev) => prev.filter((w) => w.lingering || w.id !== id))}
-              onVaultDeleted={refreshMine}
-            />
+            {feedBlurts.map((b) => (
+              <div key={b.id} className="space-card" style={{ padding: 16 }}>
+                <p style={{ margin: 0 }}>@{b.author.username}: {b.body}</p>
+              </div>
+            ))}
           </div>
         )}
 
         {tab === "space" && (
           <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            <div>
-              <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
-              <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
-                Everything you've let linger, and what's still sealed away.
-              </p>
-            </div>
-
+            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
+            <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
+              Everything you've let linger.
+            </p>
             <div className="space-stat-strip">
-              <span className="space-stat-pill">
-                <strong>{myFlashes.filter((p) => !p.fallen).length}</strong> live Flashes
-              </span>
               <span className="space-stat-pill">
                 <strong>{myBlurts.filter((w) => w.lingering).length}</strong> lingering Blurts
               </span>
-              <span className="space-stat-pill is-gold">
-                <strong>{myVaults.length}</strong> sealed Vaults
-              </span>
             </div>
-
-            <div>
-              <div className="vault-chamber-header">
-                <span className="vault-chamber-title">Live in your Space</span>
-                <span className="vault-chamber-line" aria-hidden="true" />
-              </div>
-              <SpaceGrid flashes={myFlashes} blurts={myBlurts} onSelectFlash={setSelectedFlash} />
-            </div>
-
-            {myVaults.length > 0 && (
-              <div>
-                <div className="vault-chamber-header">
-                  <span className="vault-chamber-title">Sealed Vaults</span>
-                  <span className="vault-chamber-line" aria-hidden="true" />
-                </div>
-                <div className="vault-chamber-grid">
-                  {myVaults.map((b) => <VaultCard key={b.id} vault={b} onDeleted={refreshMine} />)}
-                </div>
-              </div>
-            )}
-            {selectedFlash && (
-              <div className="space-preview-panel">
-                <div className="space-preview-header">
-                  <span className="space-preview-title">Viewing Flash</span>
-                  <button type="button" className="space-preview-close" onClick={() => setSelectedFlash(null)} aria-label="Close preview">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 6 6 18M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <div style={{ maxWidth: 420 }}>
-                  <FlashCard flash={selectedFlash} />
-                </div>
-              </div>
-            )}
+            <SpaceGrid blurts={myBlurts} />
           </div>
         )}
 
@@ -311,7 +238,6 @@ export default function Space({ onLogout }: SpaceProps) {
           <div className="haven-panel-in">
             <ProfileSettings
               profile={{ ...profile, karma: counts.tenders }}
-              onBack={() => setTab("feed")}
               onUpdated={(updated) =>
                 setProfile((prev) => (prev ? ({ ...prev, ...updated } as Profile) : prev))
               }

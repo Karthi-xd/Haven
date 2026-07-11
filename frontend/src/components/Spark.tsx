@@ -11,6 +11,7 @@ interface SparkProps {
 
 /** Rare reaction: "this genuinely changed how I see things." Visually distinct from a Buzz. */
 export default function Spark({ targetKind, targetId, count: initialCount, active: initialActive = false }: SparkProps) {
+  void targetKind;
   const [active, setActive] = useState(initialActive);
   const [count, setCount] = useState(initialCount);
   const [busy, setBusy] = useState(false);
@@ -41,9 +42,9 @@ export default function Spark({ targetKind, targetId, count: initialCount, activ
       onClick={handleClick}
       aria-pressed={active}
       title="Spark — this changed how I see things"
-      className={`feed-btn is-sm${active ? " is-solid" : ""}${pop ? " is-popping" : ""}`}
+      className={`btn is-sm${active ? " is-solid" : ""}${pop ? " is-popping" : ""}`}
     >
-      <span className="feed-btn-icon" aria-hidden="true">🌺</span>
+      <span className="btn-icon" aria-hidden="true">🌺</span>
       <span>{count > 0 ? count : "Spark"}</span>
     </button>
   );

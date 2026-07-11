@@ -227,7 +227,7 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
                 })}
               </div>
               <span className="char-counter" style={{ alignSelf: "flex-start" }}>
-                Interests personalize your feed on this device — full sync is coming soon.
+                Interests personalize your experience on this device — full sync is coming soon.
               </span>
             </div>
           </div>
