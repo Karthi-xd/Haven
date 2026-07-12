@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Blurt as BlurtType, Flash, Vault, Profile } from "../types";
-import { fetchFlashes } from "../api/api.flashes";
+import { fetchFlashes } from "../api/Flashes";
 import { fetchVaults } from "../api/api.vaults";
 import Composer from "./Composer";
 import BlurtCard from "./Blurt";

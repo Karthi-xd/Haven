@@ -9,7 +9,7 @@ import SpaceGrid from "./SpaceGrid";
 import Trail from "./Trail";
 import Den from "./Den";
 import ProfileSettings from "./ProfileSettings";
-import HomeHub from "./HomeHub";
+import HomeHub from "./Homehub";
 
 interface SpaceProps {
   onLogout: () => void;
@@ -43,11 +43,6 @@ export default function Space({ onLogout }: SpaceProps) {
       })
       .finally(() => setLoading(false));
   }, []);
-
-  function refreshMine() {
-    if (!profile) return;
-    fetchSpaceBlurts(profile.id).then(setMyBlurts);
-  }
 
   function handleBlurtCreated(newBlurt: BlurtType) {
     setFeedBlurts((prev) => [newBlurt, ...prev]);
