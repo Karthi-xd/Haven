@@ -1,5 +1,11 @@
-import type { TrailNode } from "../types";
+interface TrailProps {
+  authorId: string;
+}
 
-export async function fetchTrail(_authorId: string): Promise<TrailNode[]> {
-  return [];
+export default function Trail(_props: TrailProps) {
+  return (
+    <div style={{ color: "var(--ink-muted)", fontSize: 14.5 }}>
+      <p>No trail entries yet.</p>
+    </div>
+  );
 }
