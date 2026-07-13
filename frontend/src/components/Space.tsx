@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { fetchMe } from "../api/auth";
-import { fetchSpaceBlurts, fetchBlurts } from "../api/blurts";
+import { fetchSpaceBlurts } from "../api/blurts";
 import { fetchTendingCounts } from "../api/tending";
 import type { Profile, Blurt as BlurtType } from "../types";
 import LoadingScene from "./LoadingScene";
@@ -9,21 +9,19 @@ import SpaceGrid from "./SpaceGrid";
 import Trail from "./Trail";
 import Den from "./Den";
 import ProfileSettings from "./ProfileSettings";
-import HomeHub from "./Homehub";
 
 interface SpaceProps {
   onLogout: () => void;
 }
 
-type Tab = "home" | "space" | "trail" | "den" | "settings";
+type Tab = "space" | "trail" | "den" | "settings";
 
 export default function Space({ onLogout }: SpaceProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>("home");
+  const [tab, setTab] = useState<Tab>("space");
 
   const [myBlurts, setMyBlurts] = useState<BlurtType[]>([]);
-  const [feedBlurts, setFeedBlurts] = useState<BlurtType[]>([]);
   const [counts, setCounts] = useState({ tenders: 0, tended: 0 });
 
   useEffect(() => {
@@ -38,22 +36,9 @@ export default function Space({ onLogout }: SpaceProps) {
           setMyBlurts(blurts);
           setCounts(tendingCounts);
         }
-        const fw = await fetchBlurts();
-        setFeedBlurts(fw);
       })
       .finally(() => setLoading(false));
   }, []);
-
-  function handleBlurtCreated(newBlurt: BlurtType) {
-    setFeedBlurts((prev) => [newBlurt, ...prev]);
-    if (profile && newBlurt.author?.id === profile.id) {
-      setMyBlurts((prev) => [newBlurt, ...prev]);
-    }
-  }
-
-  function handleBlurtFallen(id: string) {
-    setFeedBlurts((prev) => prev.filter((b) => b.id !== id));
-  }
 
   if (loading) return <LoadingScene />;
 
@@ -62,12 +47,6 @@ export default function Space({ onLogout }: SpaceProps) {
   const avatar = profile?.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=haven";
 
   const NAV_ICONS: Record<Tab, ReactElement> = {
-    home: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 10.5 12 3l9 7.5" />
-        <path d="M5.5 9.5V20a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V9.5" />
-      </svg>
-    ),
     space: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
@@ -174,7 +153,6 @@ export default function Space({ onLogout }: SpaceProps) {
           </button>
 
           <nav className="space-nav">
-            {navItem("home", "Home")}
             {navItem("space", "My Space")}
             {navItem("trail", "Trail")}
             {navItem("den", "Den")}
@@ -193,20 +171,6 @@ export default function Space({ onLogout }: SpaceProps) {
 
       {/* MAIN CONTENT */}
       <main style={{ padding: "40px 60px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 24 }}>
-        {tab === "home" && (
-          <div className="haven-panel-in">
-            <HomeHub
-              profile={profile}
-              displayName={displayName}
-              feedBlurts={feedBlurts}
-              myBlurts={myBlurts}
-              counts={counts}
-              onBlurtCreated={handleBlurtCreated}
-              onFallen={handleBlurtFallen}
-            />
-          </div>
-        )}
-
         {tab === "space" && (
           <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>My Space</h1>
