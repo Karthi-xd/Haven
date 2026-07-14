@@ -25,7 +25,7 @@ const Landing = forwardRef<HTMLButtonElement, LandingProps>(function Landing(
       <div className="landing-inner">
         <div className="wordmark">
           Haven
-          <span className="kana">Communities for everything you care about</span>
+          <span className="kana">A place for every perspective.</span>
         </div>
 
         <div className="tree-wrap">
