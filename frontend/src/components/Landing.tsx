@@ -64,7 +64,7 @@ const Landing = forwardRef<HTMLButtonElement, LandingProps>(function Landing(
         <p className="tagline">
           Find your people. Own <em>your</em> corner of the internet.
         </p>
-        <p className="art-caption">Discover communities, share posts, vote on what matters, and have real conversations.</p>
+        <p className="art-caption">Share what matters. Discover new perspectives. Connect authentically.</p>
 
         <div className="cta-wrap">
           <button
