@@ -1,15 +1,15 @@
-import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
+import { useMemo, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
 import { updateProfile, getErrorMessage } from "../api/auth";
 import { uploadAvatarImage } from "../api/storage";
 
 interface UserProfile {
+  id?: string;
   username: string;
   display_name: string;
   avatar_url: string;
   karma: number;
   bio: string;
   email?: string;
-  interests?: string;
   created_at?: string;
 }
 
@@ -19,13 +19,9 @@ interface ProfileSettingsProps {
   onBack?: () => void;
 }
 
-const TOPICS = [
-  "Gaming", "Technology", "Art & Design", "Sports", "Music", "Movies & TV",
-  "Science", "Books", "Food", "Fitness", "Travel", "Photography",
-];
-
 const BIO_LIMIT = 280;
-type Tab = "profile" | "avatar" | "account";
+const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
+type Tab = "profile" | "photo" | "account";
 
 export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileSettingsProps) {
   const [tab, setTab] = useState<Tab>("profile");
@@ -33,18 +29,29 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
   const [displayName, setDisplayName] = useState(profile.display_name || "");
   const [username, setUsername] = useState(profile.username || "");
   const [bio, setBio] = useState(profile.bio || "");
-  const [interests, setInterests] = useState<string[]>(
-    profile.interests ? profile.interests.split(",").map((s) => s.trim()).filter(Boolean) : []
-  );
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar_url || "");
+  const [avatarRemoved, setAvatarRemoved] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [copied, setCopied] = useState<"link" | "id" | null>(null);
+
+  const usernameValid = username.length === 0 || USERNAME_RE.test(username);
+
+  const hasChanges = useMemo(() => {
+    return (
+      displayName.trim() !== (profile.display_name || "").trim() ||
+      username.trim() !== (profile.username || "").trim() ||
+      bio !== (profile.bio || "") ||
+      !!avatarFile ||
+      avatarRemoved
+    );
+  }, [displayName, username, bio, avatarFile, avatarRemoved, profile]);
 
   function pickFile(file: File | undefined | null) {
     if (!file) return;
@@ -57,6 +64,7 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
       return;
     }
     setError("");
+    setAvatarRemoved(false);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   }
@@ -71,37 +79,74 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
     pickFile(e.dataTransfer.files?.[0]);
   }
 
-  function removeUpload() {
+  function undoNewUpload() {
     setAvatarFile(null);
-    setAvatarPreview(profile.avatar_url || "");
+    setAvatarPreview(avatarRemoved ? "" : profile.avatar_url || "");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
-  function toggleInterest(topic: string) {
-    setInterests((prev) =>
-      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
-    );
+  function removePhoto() {
+    setAvatarFile(null);
+    setAvatarPreview("");
+    setAvatarRemoved(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function resetChanges() {
+    setDisplayName(profile.display_name || "");
+    setUsername(profile.username || "");
+    setBio(profile.bio || "");
+    setAvatarFile(null);
+    setAvatarRemoved(false);
+    setAvatarPreview(profile.avatar_url || "");
+    setError("");
+    setSuccess("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function copyToClipboard(text: string, which: "link" | "id") {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(which);
+      setTimeout(() => setCopied((prev) => (prev === which ? null : prev)), 1600);
+    } catch {
+      setError("Couldn't copy — your browser blocked clipboard access.");
+    }
   }
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    const cleanUsername = username.trim().toLowerCase();
+    if (cleanUsername && !USERNAME_RE.test(cleanUsername)) {
+      setError("Usernames need 3–20 characters: lowercase letters, numbers, or underscores only.");
+      return;
+    }
+    if (!displayName.trim()) {
+      setError("Display name can't be empty.");
+      return;
+    }
+
     setSaving(true);
     try {
       let avatar_url = profile.avatar_url;
       if (avatarFile) {
         avatar_url = await uploadAvatarImage(avatarFile);
+      } else if (avatarRemoved) {
+        avatar_url = "";
       }
       const updated = await updateProfile({
-        username: username.trim(),
+        username: cleanUsername,
         display_name: displayName.trim(),
         bio: bio.trim(),
         avatar_url,
       });
       setAvatarFile(null);
+      setAvatarRemoved(false);
       setSuccess("Your profile has been updated.");
-      onUpdated({ ...profile, ...updated, interests: interests.join(", ") });
+      onUpdated({ ...profile, ...updated });
     } catch (err: any) {
       setError(getErrorMessage(err, "Couldn't save your changes. Please try again."));
     } finally {
@@ -112,6 +157,9 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
   const joined = profile.created_at
     ? new Date(profile.created_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
     : "—";
+
+  const bioPct = bio.length / BIO_LIMIT;
+  const profileLink = `haven.app/@${(username || profile.username || "explorer").trim()}`;
 
   return (
     <div className="settings-shell">
@@ -129,54 +177,88 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
         <p>Manage how you appear across Haven.</p>
       </div>
 
-      <div className="settings-tabs">
-        <button type="button" className={`settings-tab${tab === "profile" ? " active" : ""}`} onClick={() => setTab("profile")}>Profile</button>
-        <button type="button" className={`settings-tab${tab === "avatar" ? " active" : ""}`} onClick={() => setTab("avatar")}>Avatar & Interests</button>
-        <button type="button" className={`settings-tab${tab === "account" ? " active" : ""}`} onClick={() => setTab("account")}>Account</button>
+      <div className="settings-tabs-row">
+        <div className="settings-tabs">
+          <button type="button" className={`settings-tab${tab === "profile" ? " active" : ""}`} onClick={() => setTab("profile")}>Profile</button>
+          <button type="button" className={`settings-tab${tab === "photo" ? " active" : ""}`} onClick={() => setTab("photo")}>Photo</button>
+          <button type="button" className={`settings-tab${tab === "account" ? " active" : ""}`} onClick={() => setTab("account")}>Account</button>
+        </div>
+        {hasChanges && tab !== "account" && <span className="unsaved-pill">Unsaved changes</span>}
       </div>
 
       <form onSubmit={handleSave} className="settings-panel">
         {tab === "profile" && (
-          <div className="settings-section">
-            <div className="vine-field">
-              <span className="vine-bud" aria-hidden="true" />
-              <label htmlFor="set-display">Display name</label>
-              <div className="input-wrap">
-                <input id="set-display" type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                <div className="input-underline" />
+          <div className="settings-split">
+            <div className="settings-section">
+              <div className="vine-field">
+                <span className="vine-bud" aria-hidden="true" />
+                <label htmlFor="set-display">Display name</label>
+                <div className="input-wrap">
+                  <input
+                    id="set-display"
+                    type="text"
+                    maxLength={40}
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                  />
+                  <div className="input-underline" />
+                </div>
+              </div>
+
+              <div className="vine-field">
+                <span className="vine-bud" aria-hidden="true" />
+                <label htmlFor="set-user">Username</label>
+                <div className={`input-wrap username-input-wrap${!usernameValid ? " field-invalid" : ""}`}>
+                  <span className="username-at-prefix">@</span>
+                  <input
+                    id="set-user"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                  />
+                  <div className="input-underline" />
+                </div>
+                <span className={`field-hint${!usernameValid ? " field-hint-error" : ""}`}>
+                  {usernameValid ? "Lowercase letters, numbers, and underscores only." : "3–20 characters: lowercase letters, numbers, underscores."}
+                </span>
+              </div>
+
+              <div className="vine-field">
+                <span className="vine-bud" aria-hidden="true" />
+                <label htmlFor="set-bio">Bio</label>
+                <div className="input-wrap">
+                  <textarea
+                    id="set-bio"
+                    rows={3}
+                    maxLength={BIO_LIMIT}
+                    className="bio-textarea"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell the community a little about yourself..."
+                  />
+                </div>
+                <span className={`char-counter${bioPct > 0.95 ? " char-counter-limit" : bioPct > 0.8 ? " char-counter-warn" : ""}`}>
+                  {bio.length}/{BIO_LIMIT}
+                </span>
               </div>
             </div>
 
-            <div className="vine-field">
-              <span className="vine-bud" aria-hidden="true" />
-              <label htmlFor="set-user">Username</label>
-              <div className="input-wrap username-input-wrap">
-                <span className="username-at-prefix">@</span>
-                <input id="set-user" type="text" value={username} onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))} />
-                <div className="input-underline" />
+            <div className="settings-preview" aria-hidden="true">
+              <span className="settings-preview-label">Live preview</span>
+              <div className="settings-preview-card">
+                <span className="settings-preview-avatar">
+                  {avatarPreview ? <img src={avatarPreview} alt="" /> : <span style={{ fontSize: 22 }}>🌸</span>}
+                </span>
+                <strong className="settings-preview-name">{displayName.trim() || "Your name"}</strong>
+                <span className="settings-preview-username">@{username.trim() || "username"}</span>
+                {bio.trim() && <p className="settings-preview-bio">{bio.trim()}</p>}
               </div>
-            </div>
-
-            <div className="vine-field">
-              <span className="vine-bud" aria-hidden="true" />
-              <label htmlFor="set-bio">Bio</label>
-              <div className="input-wrap">
-                <textarea
-                  id="set-bio"
-                  rows={3}
-                  maxLength={BIO_LIMIT}
-                  className="bio-textarea"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell the community a little about yourself..."
-                />
-              </div>
-              <span className="char-counter">{bio.length}/{BIO_LIMIT}</span>
+              <span className="settings-preview-note">This is how your Space card looks to others.</span>
             </div>
           </div>
         )}
 
-        {tab === "avatar" && (
+        {tab === "photo" && (
           <div className="settings-section">
             <div className="vine-field">
               <span className="vine-bud" aria-hidden="true" />
@@ -194,41 +276,27 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
                   </div>
                 </div>
                 <div className="avatar-dropzone-text">
-                  <strong>{avatarFile ? avatarFile.name : "Click or drag a new photo here"}</strong>
+                  <strong>{avatarFile ? avatarFile.name : avatarRemoved ? "Photo will be removed" : "Click or drag a new photo here"}</strong>
                   <span>PNG or JPG, up to 5MB — chosen straight from your device</span>
                 </div>
                 {avatarFile && (
-                  <button type="button" className="avatar-remove-btn" onClick={(e) => { e.stopPropagation(); removeUpload(); }}>
+                  <button type="button" className="avatar-remove-btn" onClick={(e) => { e.stopPropagation(); undoNewUpload(); }}>
                     Undo
                   </button>
                 )}
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileInput} style={{ display: "none" }} />
-            </div>
 
-            <div className="profile-divider" />
-
-            <div className="vine-field">
-              <span className="vine-bud" aria-hidden="true" />
-              <label>Interests</label>
-              <div className="topic-chip-grid">
-                {TOPICS.map((topic) => {
-                  const selected = interests.includes(topic);
-                  return (
-                    <button
-                      key={topic}
-                      type="button"
-                      className={`topic-chip${selected ? " selected" : ""}`}
-                      onClick={() => toggleInterest(topic)}
-                    >
-                      {topic}
-                    </button>
-                  );
-                })}
-              </div>
-              <span className="char-counter" style={{ alignSelf: "flex-start" }}>
-                Interests personalize your experience on this device — full sync is coming soon.
-              </span>
+              {!avatarFile && profile.avatar_url && !avatarRemoved && (
+                <button type="button" className="text-danger-btn" onClick={removePhoto}>
+                  Remove current photo
+                </button>
+              )}
+              {avatarRemoved && (
+                <button type="button" className="text-danger-btn" onClick={undoNewUpload}>
+                  Keep current photo
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -247,6 +315,26 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
               <span className="account-row-label">Karma</span>
               <span className="account-row-value">{profile.karma}</span>
             </div>
+            <div className="account-row">
+              <span className="account-row-label">Profile link</span>
+              <span className="account-row-value copy-row">
+                {profileLink}
+                <button type="button" className="copy-btn" onClick={() => copyToClipboard(`https://${profileLink}`, "link")}>
+                  {copied === "link" ? "Copied" : "Copy"}
+                </button>
+              </span>
+            </div>
+            {profile.id && (
+              <div className="account-row">
+                <span className="account-row-label">User ID</span>
+                <span className="account-row-value copy-row">
+                  <span className="mono-id">{profile.id.slice(0, 8)}…</span>
+                  <button type="button" className="copy-btn" onClick={() => copyToClipboard(profile.id!, "id")}>
+                    {copied === "id" ? "Copied" : "Copy"}
+                  </button>
+                </span>
+              </div>
+            )}
             <p className="settings-hint">Password and connected-account management aren't available yet — coming soon.</p>
           </div>
         )}
@@ -255,9 +343,16 @@ export default function ProfileSettings({ profile, onUpdated, onBack }: ProfileS
         {success && <p className="form-success">{success}</p>}
 
         {tab !== "account" && (
-          <button type="submit" className="login-submit" disabled={saving} style={{ marginTop: 8 }}>
-            {saving ? "Saving…" : "Save changes"}
-          </button>
+          <div className="settings-actions">
+            {hasChanges && (
+              <button type="button" className="btn btn-ghost" onClick={resetChanges} disabled={saving}>
+                Discard
+              </button>
+            )}
+            <button type="submit" className="login-submit" disabled={saving || !hasChanges || !usernameValid}>
+              {saving ? "Saving…" : "Save changes"}
+            </button>
+          </div>
         )}
       </form>
     </div>
