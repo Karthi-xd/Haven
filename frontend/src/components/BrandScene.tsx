@@ -57,7 +57,7 @@ export default function BrandScene({}: BrandSceneProps) {
             <circle cx="76" cy="6" r="3" fill="var(--cherry-bright)" />
           </svg>
         </span>
-        <p className="brand-quote">A place for peace.</p>
+        <p className="brand-quote"> place for peace.</p>
       </div>
     </div>
   );
