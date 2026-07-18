@@ -25,27 +25,38 @@ export interface Blurt {
   chime_count: number;
 }
 
-/** A quick, media-first burst that lives for a short window — the "story" layer of Haven. */
+export type MediaKind = "image" | "video";
+
+/** A quick, media-first burst that lives for 24h unless `lingering` is set — the "story" layer of Haven. */
 export interface Flash {
   id: string;
   author: Profile;
   media_url: string;
+  media_kind: MediaKind;
   caption: string;
+  lingering: boolean; // same "let it linger" mechanic as a Blurt
   posted_at: string;
   expires_at: string | null;
-  seen_count: number;
-  spark_count: number;
+  fallen: boolean;
 }
 
-/** A saved, permanent piece a user chooses to keep forever in their Space. */
-export interface Vault {
+/**
+ * A Flash sealed away and addressed to a moment in the future.
+ * It stays hidden — not even the author can see the media preview again —
+ * until `scheduled_for` arrives, at which point it breaks its seal and
+ * is released onto the Trail as a normal Flash (permanent if `permanent`
+ * was set when it was sealed, otherwise it starts its usual 24h fall).
+ */
+export interface VaultEntry {
   id: string;
-  author: Profile;
-  title: string;
-  body: string;
-  cover_url: string | null;
-  saved_at: string;
-  buzz_count: number;
+  media_url: string;
+  media_kind: MediaKind;
+  caption: string;
+  sealed_at: string;
+  scheduled_for: string;
+  permanent: boolean;
+  released: boolean;
+  released_flash_id: string | null;
 }
 
 export type ReactableKind = "blurt";
