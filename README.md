@@ -1,1 +1,3 @@
+# Haven
 
+A simple project.
