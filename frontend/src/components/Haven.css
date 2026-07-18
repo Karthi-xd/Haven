@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap');
 
 :root {
   --white: #FFFFFF;
@@ -32,7 +32,7 @@ html, body, #root {
   height: 100%;
   background: var(--white);
   color: var(--ink);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   overflow: hidden;
 }
 
@@ -125,7 +125,7 @@ html, body, #root {
   font-size: 12px;
   letter-spacing: 0.35em;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   margin-top: 6px;
   font-weight: 500;
 }
@@ -282,7 +282,7 @@ html, body, #root {
   font-size: 10px;
   letter-spacing: 0.42em;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-weight: 500;
   margin-left: 2px;
   transition: color 0.3s ease;
@@ -493,7 +493,7 @@ html, body, #root {
   background: none;
   border: none;
   padding: 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
 }
 .back-link:hover { color: var(--cherry); gap: 9px; }
 .back-link svg { transition: transform 0.2s ease; }
@@ -597,7 +597,7 @@ form { display: flex; flex-direction: column; gap: 20px; }
 
 .vine-field input {
   width: 100%;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 15.5px;
   padding: 9px 2px 11px;
   border: none;
@@ -777,7 +777,7 @@ input:focus-visible {
   background: transparent;
   border: 1.5px solid var(--line);
   border-radius: 8px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 14.5px;
   font-weight: 500;
   color: var(--ink);
@@ -1020,7 +1020,7 @@ input:focus-visible {
   padding: 0;
   text-decoration: underline;
   text-underline-offset: 2px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
 }
 
 /* Username live preview inside the input */
@@ -1093,7 +1093,7 @@ input:focus-visible {
 }
 
 .loading-text {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -1185,7 +1185,7 @@ input:focus-visible {
 }
 .brand-quote {
   margin: 10px 0 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--ink-muted);
@@ -1292,7 +1292,7 @@ input:focus-visible {
   background: none;
   border: none;
   padding: 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink-muted);
@@ -1304,7 +1304,7 @@ input:focus-visible {
 .settings-head { display: flex; flex-direction: column; gap: 4px; }
 
 .settings-eyebrow {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1322,7 +1322,7 @@ input:focus-visible {
 
 .settings-head p {
   margin: 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 14px;
   color: var(--ink-muted);
 }
@@ -1344,7 +1344,7 @@ input:focus-visible {
   background: transparent;
   padding: 9px 18px;
   border-radius: 999px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink-muted);
@@ -1386,7 +1386,7 @@ input:focus-visible {
   width: 100%;
   resize: vertical;
   min-height: 76px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 14.5px;
   color: var(--ink);
   background: transparent;
@@ -1397,14 +1397,14 @@ input:focus-visible {
 
 .char-counter {
   align-self: flex-end;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11.5px;
   color: var(--ink-muted);
 }
 
 .username-input-wrap { display: flex; align-items: center; gap: 4px; }
 .username-at-prefix {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-weight: 600;
   color: var(--ink-muted);
 }
@@ -1461,7 +1461,7 @@ input:focus-visible {
   min-width: 0;
 }
 .avatar-dropzone-text strong {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 14px;
   color: var(--ink);
   white-space: nowrap;
@@ -1469,7 +1469,7 @@ input:focus-visible {
   text-overflow: ellipsis;
 }
 .avatar-dropzone-text span {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12px;
   color: var(--ink-muted);
 }
@@ -1481,7 +1481,7 @@ input:focus-visible {
   background: var(--white);
   border-radius: 999px;
   padding: 7px 14px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--ink-muted);
@@ -1502,7 +1502,7 @@ input:focus-visible {
   background: var(--white);
   border-radius: 999px;
   padding: 8px 16px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13px;
   font-weight: 500;
   color: var(--ink);
@@ -1529,20 +1529,20 @@ input:focus-visible {
 .account-row:last-of-type { border-bottom: none; }
 
 .account-row-label {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--ink-muted);
 }
 .account-row-value {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 14px;
   color: var(--ink);
 }
 
 .settings-hint {
   margin: 14px 0 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   color: var(--ink-muted);
   background: var(--white-soft);
@@ -1555,7 +1555,7 @@ input:focus-visible {
   font-size: 13px;
   color: #2E7D4F;
   margin: -8px 0 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
 }
 
 @media (max-width: 560px) {
@@ -1572,7 +1572,7 @@ input:focus-visible {
   align-items: center;
   gap: 10px;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   padding: 30px 0;
 }
@@ -1604,7 +1604,7 @@ input:focus-visible {
 
 .den-section-title {
   margin: 4px 0 8px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1643,7 +1643,7 @@ input:focus-visible {
   color: var(--ink);
 }
 .ping-message {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   color: var(--ink-muted);
   overflow: hidden;
@@ -1671,7 +1671,7 @@ input:focus-visible {
   background: var(--white);
   border-radius: 999px;
   padding: 9px 14px 9px 34px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13px;
   color: var(--ink);
   outline: none;
@@ -1689,7 +1689,7 @@ input:focus-visible {
 }
 
 .den-empty-hint {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   color: var(--ink-muted);
   line-height: 1.5;
@@ -1784,7 +1784,7 @@ input:focus-visible {
   gap: 6px;
 }
 .den-convo-name {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink);
@@ -1794,12 +1794,12 @@ input:focus-visible {
 }
 .den-convo-time {
   flex-shrink: 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 10.5px;
   color: var(--ink-muted);
 }
 .den-convo-preview {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12px;
   color: var(--ink-muted);
   white-space: nowrap;
@@ -1839,7 +1839,7 @@ input:focus-visible {
   padding: 30px;
   margin: 20px;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   border: 1.5px dashed var(--line);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.5);
@@ -1904,7 +1904,7 @@ input:focus-visible {
   color: var(--ink);
 }
 .den-chat-header-sub {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11.5px;
   color: var(--ink-muted);
 }
@@ -1925,7 +1925,7 @@ input:focus-visible {
   gap: 10px;
   margin: 14px 0 10px;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1969,7 +1969,7 @@ input:focus-visible {
   color: var(--ink);
   border-radius: 17px 17px 17px 17px;
   padding: 9px 14px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   line-height: 1.45;
   word-break: break-word;
@@ -2085,7 +2085,7 @@ input:focus-visible {
   background: transparent;
   border-radius: 16px;
   padding: 7px 4px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   color: var(--ink);
   outline: none;
@@ -2169,7 +2169,7 @@ input:focus-visible {
   gap: 8px;
   border: none;
   border-radius: 999px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-weight: 700;
   font-size: 13.5px;
   padding: 11px 22px;
@@ -2214,7 +2214,7 @@ input:focus-visible {
   border: none;
   background: transparent;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-weight: 500;
   font-size: 14px;
   padding: 11px 14px;
@@ -2312,8 +2312,8 @@ input:focus-visible {
   font-family: 'Shippori Mincho', serif;
   font-weight: 600;
 }
-.profile-card-username { margin: 0 0 10px; font-size: 12px; color: var(--ink-muted); font-family: 'Zen Kaku Gothic New', sans-serif; }
-.profile-card-bio { margin: 0 0 10px; font-size: 12px; color: var(--ink); font-family: 'Zen Kaku Gothic New', sans-serif; line-height: 1.4; }
+.profile-card-username { margin: 0 0 10px; font-size: 12px; color: var(--ink-muted); font-family: 'Shippori Mincho', serif; }
+.profile-card-bio { margin: 0 0 10px; font-size: 12px; color: var(--ink); font-family: 'Shippori Mincho', serif; line-height: 1.4; }
 .profile-card-stats {
   display: flex;
   gap: 16px;
@@ -2332,7 +2332,7 @@ input:focus-visible {
 .profile-card-stat span {
   color: var(--ink-muted);
   font-size: 10px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -2351,7 +2351,7 @@ input:focus-visible {
   text-align: center;
   padding: 50px 20px;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 13.5px;
   border: 1.5px dashed var(--line);
   border-radius: 20px;
@@ -2365,7 +2365,7 @@ input:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   color: var(--ink-muted);
   background: rgba(255, 255, 255, 0.7);
@@ -2462,7 +2462,7 @@ input:focus-visible {
   position: absolute;
   top: 8px;
   right: 8px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -2487,7 +2487,7 @@ input:focus-visible {
 .space-tile-blurt-icon { font-size: 18px; opacity: 0.85; }
 .space-tile-blurt-text {
   margin: 0;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   line-height: 1.4;
   color: var(--ink);
@@ -2584,11 +2584,11 @@ input:focus-visible {
   display: flex;
   gap: 8px;
   font-size: 13px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
 }
 .chime-row .chime-author { font-weight: 700; color: var(--cherry); flex-shrink: 0; }
 .chime-row .chime-body { color: var(--ink); }
-.chime-empty { font-size: 12.5px; color: var(--ink-muted); font-family: 'Zen Kaku Gothic New', sans-serif; }
+.chime-empty { font-size: 12.5px; color: var(--ink-muted); font-family: 'Shippori Mincho', serif; }
 
 .chime-input {
   flex: 1;
@@ -2596,7 +2596,7 @@ input:focus-visible {
   border-radius: 999px;
   padding: 9px 15px;
   font-size: 13px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   outline: none;
   background: rgba(255, 255, 255, 0.7);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
@@ -2643,7 +2643,7 @@ input:focus-visible {
   border: 1.5px solid var(--line);
   border-radius: 18px;
   padding: 14px 16px;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 15px;
   line-height: 1.55;
   color: var(--ink);
@@ -2667,7 +2667,7 @@ input:focus-visible {
   margin-top: 8px;
 }
 .composer-counter-text {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11.5px;
   font-weight: 600;
   color: var(--ink-muted);
@@ -2698,7 +2698,7 @@ input:focus-visible {
   background: rgba(196, 24, 60, 0.08);
   border: 1px solid rgba(196, 24, 60, 0.22);
   color: var(--cherry-deep);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 12.5px;
   font-weight: 600;
   animation: composer-error-in 0.3s var(--ease-out) both;
@@ -2882,7 +2882,7 @@ input:focus-visible {
   right: -8px;
   background: var(--gold);
   color: #fff;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -2937,7 +2937,7 @@ input:focus-visible {
 .home-hero-eyebrow {
   position: relative;
   z-index: 1;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   letter-spacing: 0.32em;
   font-size: 11px;
   text-transform: uppercase;
@@ -3045,7 +3045,7 @@ input:focus-visible {
   padding: 3px 10px;
   border-radius: 999px;
   text-transform: uppercase;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
 }
 .home-type-badge.is-blurt { background: rgba(196, 24, 60, 0.1); color: var(--cherry-deep); }
 .home-type-badge.is-flash { background: var(--flash-soft); color: var(--flash-deep); }
@@ -3121,7 +3121,7 @@ input:focus-visible {
   gap: 10px;
 }
 .trail-card-time {
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   font-size: 11.5px;
   color: var(--ink-muted);
 }
@@ -3136,7 +3136,7 @@ input:focus-visible {
   padding: 3px 10px;
   border-radius: 999px;
   text-transform: uppercase;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   white-space: nowrap;
 }
 .trail-badge.is-lingering { background: rgba(196, 24, 60, 0.1); color: var(--cherry-deep); }
@@ -3164,6 +3164,342 @@ input:focus-visible {
   gap: 14px;
   font-size: 12px;
   color: var(--ink-muted);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Shippori Mincho', serif;
 }
 .trail-card-actions { display: flex; gap: 6px; }
+/* =========================================================================
+   TRAIL — a stepping-stone path down the page. Every Blurt and Flash gets
+   a small knot on the thread running down the left edge: solid cherry for
+   a Blurt, solid gold for a Flash, hollow and faded once it has fallen,
+   haloed once it's been let to linger.
+   ========================================================================= */
+
+.trail-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+.trail-mode-tab {
+  border: 1.5px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 7px 18px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+.trail-mode-tab:hover { color: var(--ink); }
+.trail-mode-tab.active { color: var(--cherry-deep); border-color: var(--cherry); background: var(--blush-soft); }
+.trail-mode-tab.is-flash.active { color: var(--flash-deep); border-color: var(--flash); background: var(--flash-soft); }
+.trail-vault-link {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: var(--vault-deep);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+.trail-vault-link:hover { opacity: 1; }
+
+.composer-shell.is-vault::before {
+  background: linear-gradient(90deg, #8B6FD9, var(--vault), var(--vault-deep));
+}
+.composer-submit.is-flash {
+  background: linear-gradient(135deg, #E4BE6C 0%, var(--flash) 100%);
+  box-shadow: 0 6px 18px rgba(201, 162, 75, 0.32);
+}
+.composer-submit.is-flash:hover:not(:disabled) { box-shadow: 0 12px 28px rgba(201, 162, 75, 0.4); }
+.composer-submit.is-vault {
+  background: linear-gradient(135deg, #8B6FD9 0%, var(--vault) 100%);
+  box-shadow: 0 6px 18px rgba(108, 75, 192, 0.32);
+}
+.composer-submit.is-vault:hover:not(:disabled) { box-shadow: 0 12px 28px rgba(108, 75, 192, 0.4); }
+.composer-textarea.is-caption { min-height: unset; padding: 12px 16px; }
+
+.flash-forever-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.flash-forever-toggle input { width: 15px; height: 15px; accent-color: var(--flash); cursor: pointer; }
+.flash-forever-toggle.is-vault input { accent-color: var(--vault); }
+
+/* ---------- Media dropzone (Flash + Vault composers) ---------- */
+.media-drop {
+  position: relative;
+  min-height: 168px;
+  border: 1.5px dashed var(--line);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.45);
+  overflow: hidden;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.media-drop.is-dragging { background: var(--blush-soft); }
+.media-drop.is-flash.is-dragging, .media-drop.is-flash:not(.has-file):hover { border-color: var(--flash); background: var(--flash-soft); }
+.media-drop.is-vault.is-dragging, .media-drop.is-vault:not(.has-file):hover { border-color: var(--vault); background: var(--vault-soft); }
+.media-drop-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; color: var(--ink-muted); pointer-events: none; }
+.media-drop-aperture { width: 38px; height: 38px; }
+.media-drop.is-flash .media-drop-aperture { color: var(--flash-deep); }
+.media-drop.is-vault .media-drop-aperture { color: var(--vault-deep); }
+.media-drop-label { margin: 0; font-family: 'Shippori Mincho', serif; font-size: 13px; text-align: center; max-width: 260px; line-height: 1.5; }
+.media-drop-preview { position: relative; width: 100%; }
+.media-drop-preview img, .media-drop-preview video { display: block; width: 100%; max-height: 300px; object-fit: cover; }
+.media-drop-clear {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(28, 19, 16, 0.55);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.media-drop-clear svg { width: 13px; height: 13px; }
+
+/* ---------- The path itself ---------- */
+.trail-path {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-left: 36px;
+}
+.trail-path::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, var(--line) 0 6px, transparent 6px 12px);
+}
+.trail-path-item {
+  position: relative;
+  animation: trail-card-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+.trail-node {
+  position: absolute;
+  left: -25px;
+  top: 24px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--white);
+  z-index: 1;
+}
+.trail-node.is-blurt { background: var(--cherry); }
+.trail-node.is-flash { background: var(--flash); }
+.trail-node.is-fallen { background: #cfc4c2; opacity: 0.7; }
+.trail-node.is-blurt.is-lingering { box-shadow: 0 0 0 5px rgba(196, 24, 60, 0.16); }
+.trail-node.is-flash.is-lingering { box-shadow: 0 0 0 5px rgba(201, 162, 75, 0.2); }
+
+/* ---------- Flash stones on the Trail ---------- */
+.trail-stone {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 230px;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: #17140f;
+  box-shadow: 0 10px 26px rgba(201, 162, 75, 0.16);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  animation: trail-card-in 0.4s var(--ease-out) both;
+}
+.trail-stone:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(201, 162, 75, 0.24); }
+.trail-stone img, .trail-stone video { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.94; }
+.trail-stone-ring { position: absolute; top: 8px; left: 8px; width: 34px; height: 34px; transform: rotate(-90deg); }
+.trail-stone-ring .ring-track { fill: none; stroke: rgba(255, 255, 255, 0.32); stroke-width: 2.5; }
+.trail-stone-ring .ring-fill.is-flash { fill: none; stroke: var(--flash); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.trail-stone-time {
+  position: absolute;
+  bottom: 9px;
+  left: 11px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+}
+.trail-stone-caption {
+  position: absolute;
+  bottom: 9px;
+  right: 11px;
+  max-width: 55%;
+  font-size: 10.5px;
+  color: #fff;
+  text-align: right;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   FLASH VIEWER — a small dark lightbox, story-style, opened from a stone.
+   ========================================================================= */
+@keyframes flash-viewer-in { from { opacity: 0; } to { opacity: 1; } }
+.flash-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(18, 10, 9, 0.74);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px;
+  animation: flash-viewer-in 0.22s var(--ease-out) both;
+}
+.flash-viewer-card {
+  position: relative;
+  width: min(380px, 92vw);
+  max-height: 88vh;
+  background: #0f0f10;
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+}
+.flash-viewer-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flash-viewer-close svg { width: 14px; height: 14px; }
+.flash-viewer-media { position: relative; width: 100%; aspect-ratio: 3 / 4; background: #000; }
+.flash-viewer-media img, .flash-viewer-media video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+.flash-viewer-ring { position: absolute; top: 14px; left: 14px; width: 42px; height: 42px; transform: rotate(-90deg); }
+.flash-viewer-ring .ring-track { fill: none; stroke: rgba(255, 255, 255, 0.25); stroke-width: 2.5; }
+.flash-viewer-ring .ring-fill { fill: none; stroke: var(--flash); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.flash-viewer-footer { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 12px; background: #17140f; }
+.flash-viewer-meta { display: flex; flex-direction: column; gap: 8px; }
+.flash-viewer-caption { margin: 0; color: #f4ede4; font-size: 13.5px; font-family: 'Shippori Mincho', serif; line-height: 1.5; }
+.flash-viewer-actions { display: flex; gap: 8px; }
+.flash-viewer-actions .btn { color: #f4ede4; border-color: rgba(255, 255, 255, 0.2); }
+.flash-viewer-actions .btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); }
+
+/* =========================================================================
+   VAULT — sealed Flashes waiting for their moment. Each entry is a small
+   wax-sealed letter; the seal cracks in two the instant it opens.
+   ========================================================================= */
+.vault-schedule-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.vault-schedule-field { display: flex; flex-direction: column; gap: 6px; font-family: 'Shippori Mincho', serif; font-size: 12.5px; color: var(--ink-muted); }
+.vault-datetime {
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.7);
+}
+.vault-datetime:focus { outline: none; border-color: var(--vault); box-shadow: 0 0 0 4px rgba(108, 75, 192, 0.12); }
+
+.space-grid-empty.is-vault { border-color: rgba(108, 75, 192, 0.24); }
+
+.vault-seal-list { display: flex; flex-direction: column; gap: 16px; }
+.vault-seal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 26px rgba(108, 75, 192, 0.08);
+  animation: trail-card-in 0.4s var(--ease-out) both;
+}
+.vault-seal-wax {
+  position: relative;
+  isolation: isolate;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #8B6FD9, var(--vault-deep) 78%);
+  box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.3), 0 3px 10px rgba(108, 75, 192, 0.35);
+}
+.vault-seal-wax::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(var(--vault) calc(var(--seal-progress, 0) * 360deg), rgba(108, 75, 192, 0.14) 0deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+}
+.vault-seal-glyph { color: rgba(255, 255, 255, 0.88); font-size: 17px; line-height: 1; }
+.vault-seal-wax-half { position: absolute; top: 0; bottom: 0; width: 50%; transition: transform 0.6s var(--ease-out); }
+.vault-seal-wax-half.is-left { left: 0; transform-origin: left center; }
+.vault-seal-wax-half.is-right { right: 0; transform-origin: right center; }
+.vault-seal.is-opening .vault-seal-wax-half.is-left { transform: rotateY(65deg); }
+.vault-seal.is-opening .vault-seal-wax-half.is-right { transform: rotateY(-65deg); }
+.vault-seal.is-opening .vault-seal-wax { animation: vault-glow 1.5s ease-in-out infinite; }
+@keyframes vault-glow {
+  0%, 100% { box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.3), 0 3px 10px rgba(108, 75, 192, 0.35); }
+  50% { box-shadow: inset 0 -2px 6px rgba(0, 0, 0, 0.3), 0 3px 24px 6px rgba(139, 111, 217, 0.6); }
+}
+.vault-seal-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.vault-seal-caption { margin: 0; font-family: 'Shippori Mincho', serif; font-size: 14.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vault-seal-countdown { font-size: 12px; font-weight: 700; color: var(--vault-deep); letter-spacing: 0.02em; }
+.vault-seal-date { font-size: 11px; color: var(--ink-muted); }
+.vault-seal-tag {
+  display: inline-block;
+  margin-top: 2px;
+  width: fit-content;
+  font-size: 10.5px;
+  color: var(--vault-deep);
+  background: var(--vault-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.vault-seal-break { flex-shrink: 0; }
