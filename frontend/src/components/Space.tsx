@@ -7,6 +7,7 @@ import LoadingScene from "./LoadingScene";
 import Wake from "./Wake";
 import SpaceGrid from "./SpaceGrid";
 import Trail from "./Trail";
+import Vault from "./Vault";
 import Den from "./Den";
 import ProfileSettings from "./ProfileSettings";
 
@@ -14,7 +15,7 @@ interface SpaceProps {
   onLogout: () => void;
 }
 
-type Tab = "space" | "trail" | "den" | "settings";
+type Tab = "space" | "trail" | "vault" | "den" | "settings";
 
 export default function Space({ onLogout }: SpaceProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -63,6 +64,13 @@ export default function Space({ onLogout }: SpaceProps) {
         <path d="M7.6 7.6 15.8 11M16 14l-6 3.6" />
       </svg>
     ),
+    vault: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3 4 7v6c0 4.2 3.2 7.6 8 9 4.8-1.4 8-4.8 8-9V7l-8-4Z" />
+        <circle cx="12" cy="12" r="2.4" />
+        <path d="M12 14.4V17" />
+      </svg>
+    ),
     den: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5Z" />
@@ -95,7 +103,7 @@ export default function Space({ onLogout }: SpaceProps) {
         width: "100vw",
         height: "100vh",
         background: "linear-gradient(180deg, #FFFFFF 0%, #FFF6F7 55%, #FFEFF1 100%)",
-        fontFamily: "Zen Kaku Gothic New, sans-serif",
+        fontFamily: "Shippori Mincho, serif",
       }}
     >
       <Wake />
@@ -155,6 +163,7 @@ export default function Space({ onLogout }: SpaceProps) {
           <nav className="space-nav">
             {navItem("space", "My Space")}
             {navItem("trail", "Trail")}
+            {navItem("vault", "Vault")}
             {navItem("den", "Den")}
             {navItem("settings", "Profile Settings")}
           </nav>
@@ -189,7 +198,20 @@ export default function Space({ onLogout }: SpaceProps) {
         {tab === "trail" && profile && (
           <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Trail</h1>
-            <Trail authorId={profile.id} />
+            <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
+              Every Blurt and Flash you've set down, in the order you left them.
+            </p>
+            <Trail authorId={profile.id} onOpenVault={() => setTab("vault")} />
+          </div>
+        )}
+
+        {tab === "vault" && profile && (
+          <div className="haven-panel-in" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <h1 style={{ fontFamily: "Shippori Mincho, serif", fontSize: 28, margin: "0 0 6px", color: "var(--ink)" }}>Vault</h1>
+            <p style={{ color: "var(--ink-muted)", fontSize: 14.5, margin: 0 }}>
+              Seal a Flash away for later — it stays hidden, even from you, until its moment arrives.
+            </p>
+            <Vault authorId={profile.id} />
           </div>
         )}
 
