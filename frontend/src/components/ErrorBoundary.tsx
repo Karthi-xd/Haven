@@ -45,7 +45,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             gap: 16,
             background: "linear-gradient(180deg, #FFFFFF 0%, #FFF6F7 55%, #FFEFF1 100%)",
             color: "var(--ink, #1C1310)",
-            fontFamily: "'Zen Kaku Gothic New', sans-serif",
+            fontFamily: "'Shippori Mincho', serif",
             padding: 24,
             textAlign: "center",
           }}
